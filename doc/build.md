@@ -11,7 +11,7 @@ make install
 构建:
 
 ```bash
-make build
+make -B build
 ```
 
 注意，`make build-linux` 会出错，是因为一个命令行工具没有安装，这个命令行是生成swagger文档的，暂时没用。
@@ -124,9 +124,9 @@ irita add-genesis-account $(irita keys show mathxh -a) 1000000000point --home=te
 # 导出validator节点 node0（步骤1生成的）私钥为 pem 格式，方便用于申请节点证书
 irita genkey --home=testnet --out-file priv_validator.pem
 # OR 普通节点（目前这里用不到）
-irita genkey --type node --out-file=<output-file> --home=<home>
+irita genkey --type node --out-file=<output-file> --home=testnet
 
-# 生成证书请求文件 如果OpenSSL不支持sm3，就会报错，所要自己编译安装OpenSSL支持国密的版本
+# 生成证书请求文件 如果OpenSSL不支持sm3，就会报错，所要自己编译安装OpenSSL支持国密的版本, 自己编译的OpenSSL默认安装在 /usr/local/bin/openssl
 openssl req -new -key priv_validator.pem -out req.csr -sm3 -sigopt "distid:1234567812345678"
 openssl req -in req.csr -text
 
@@ -137,12 +137,12 @@ openssl req -new -x509 -sm3 -sigopt "distid:1234567812345678" -key root.key -out
 openssl x509 -in root.crt --text
 
 # 自签
-openssl x509 -req -in <req.csr> -out node0.crt -sm3 -sigopt "distid:1234567812345678" -vfyopt "distid:1234567812345678" -CA <root.crt> -CAkey <root.key> -CAcreateserial
+openssl x509 -req -in req.csr -out node0.crt -sm3 -sigopt "distid:1234567812345678" -vfyopt "distid:1234567812345678" -CA root.crt -CAkey root.key -CAcreateserial
 
 # 导入 IRITA 网络的企业根证书(需要先获取根证书)
-irita set-root-cert ca.crt --home=testnet
+irita set-root-cert root.crt --home=testnet
 
-# 添加 node0 到 genesis.json 文件
+# 添加 node0 到 genesis.json 文件  这里会报错 Error: node0.info: key not found，https://github.com/bianjieai/irita/issues/188
 irita add-genesis-validator --name node0 --cert node0.crt --power 100 --home=testnet --from node0
 
 # 启动
@@ -154,7 +154,8 @@ irita start --home=testnet --pruning=nothing
 
 ```bash
 # 会自动配置节点证书和根证书, 如果OpenSSL不支持sm3，就会报错，所要自己编译安装OpenSSL支持国密的版本
-irita testnet --v 1 --output-dir ./testnet --chain-id=test
+irita testnet --v 1 --output-dir ./testnet --chain-id=test --keyring-backend test
+irita start --home=testnet/node0/irita --pruning=nothing
 ```
 
 ```txt
