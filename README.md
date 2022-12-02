@@ -26,7 +26,7 @@ cd openssl && ./config
 
 sudo make install
 
-3.安装 jq
+3.安装 jq(https://stedolan.github.io/jq/download/),sed命令
 
 编译运行节点
 
