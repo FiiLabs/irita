@@ -187,7 +187,7 @@ localnet-init:
 	@echo "Faucet key seed: tube lonely pause spring gym veteran know want grid tired taxi such same mesh charge orient bracket ozone concert once good quick dry boss"
 
 localnet-start: localnet-init localnet-stop
-	docker-compose up -d
+	docker-compose up 
 
 localnet-stop:
 	docker-compose down
