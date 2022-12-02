@@ -10,7 +10,8 @@ RUN echo -e http://mirrors.ustc.edu.cn/alpine/v3.12/main/ > /etc/apk/repositorie
 RUN set -eux; apk add --no-cache ca-certificates build-base;
 
 # Set up dependencies
-ENV PACKAGES make gcc git libc-dev bash openssl
+# https://stackoverflow.com/questions/30624829/no-such-file-or-directory-limits-h-when-installing-pillow-on-alpine-linux
+ENV PACKAGES make gcc git libc-dev bash openssl musl-dev
 
 WORKDIR /irita
 
@@ -25,7 +26,7 @@ RUN apk add $PACKAGES
 
 # See https://github.com/CosmWasm/wasmvm/releases
 # ADD https://github.com/CosmWasm/wasmvm/releases/download/v0.16.0/libwasmvm_muslc.a /lib/libwasmvm_muslc.a
-ADD libwasmvm-muslc/libwasmvm_muslc.a /lib/libwasmvm_muslc.a
+ADD image-deps/libwasmvm_muslc.a /lib/libwasmvm_muslc.a
 RUN sha256sum /lib/libwasmvm_muslc.a | grep ef294a7a53c8d0aa6a8da4b10e94fb9f053f9decf160540d6c7594734bc35cd6
 
 RUN go env -w GOPROXY=https://goproxy.cn
@@ -33,16 +34,30 @@ RUN LEDGER_ENABLED=false BUILD_TAGS=muslc make build
 
 # ----------------------------
 
-FROM ubuntu:16.04
+FROM ubuntu:20.04
 
 # Set up dependencies
 ENV PACKAGES make gcc perl wget
 
 WORKDIR /
 
+RUN echo 'deb http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse' > /etc/apt/sources.list
+RUN echo 'deb-src http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse' >> /etc/apt/sources.list
+RUN echo 'deb http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse' >> /etc/apt/sources.list
+RUN echo 'deb-src http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse' >> /etc/apt/sources.list
+RUN echo 'deb http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse' >> /etc/apt/sources.list
+RUN echo 'deb-src http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse' >> /etc/apt/sources.list
+RUN echo 'deb http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse' >> /etc/apt/sources.list
+RUN echo 'deb-src http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse' >> /etc/apt/sources.list
+RUN echo 'deb http://mirrors.aliyun.com/ubuntu/ focal-proposed main restricted universe multiverse' >> /etc/apt/sources.list
+RUN echo 'deb-src http://mirrors.aliyun.com/ubuntu/ focal-proposed main restricted universe multiverse' >> /etc/apt/sources.list
+
+
+COPY image-deps/openssl-3.0.0-alpha4.tar.gz .
+
 # Install openssl 3.0.0
-RUN apt-get update && apt-get install $PACKAGES -y \
-    && wget https://github.com/openssl/openssl/archive/openssl-3.0.0-alpha4.tar.gz \
+# https://github.com/phusion/baseimage-docker/issues/319
+RUN apt-get update && apt-get install $PACKAGES -y --no-install-recommends apt-utils \
     && tar -xzvf openssl-3.0.0-alpha4.tar.gz \
     && cd openssl-openssl-3.0.0-alpha4 && ./config \
     && make install \
