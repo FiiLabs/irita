@@ -105,4 +105,46 @@ for i in `seq 0 $[ ${#Validators[*]} -1 ]`; do cp $Home/config/config.toml ${Nod
 for i in `seq 0 $[ ${#Validators[*]} -1 ]`; do cp $Home/config/genesis.json ${NodeDic[$i]}/config; done
 for i in `seq 0 $[ ${#Validators[*]} -1 ]`; do cp $Home/config/app.toml ${NodeDic[$i]}/config; done
 
+sed -i 's/address = "tcp:\/\/0.0.0.0:1317"/address = "tcp:\/\/0.0.0.0:31317"/' ${NodeDic[1]}/config/app.toml
+sed -i 's/address = ":8080"/address = ":38080"/' ${NodeDic[1]}/config/app.toml
+sed -i 's/address = "0.0.0.0:9090"/address = "0.0.0.0:39090"/' ${NodeDic[1]}/config/app.toml
+sed -i 's/address = "0.0.0.0:9091"/address = "0.0.0.0:39091"/' ${NodeDic[1]}/config/app.toml
+sed -i 's/address = "0.0.0.0:8545"/address = "0.0.0.0:38545"/' ${NodeDic[1]}/config/app.toml
+sed -i 's/ws-address = "0.0.0.0:8546"/ws-address = "0.0.0.0:38546"/' ${NodeDic[1]}/config/app.toml
+sed -i 's/proxy_app = "tcp:\/\/127.0.0.1:26658"/proxy_app = "tcp:\/\/127.0.0.1:36658"/' ${NodeDic[1]}/config/config.toml
+sed -i 's/laddr = "tcp:\/\/0.0.0.0:26657"/proxy_app = "tcp:\/\/0.0.0.0:36657"/' ${NodeDic[1]}/config/config.toml
+sed -i 's/pprof_laddr = "localhost:6060"/pprof_laddr = "localhost:36060"/' ${NodeDic[1]}/config/config.toml
+sed -i 's/laddr = "tcp:\/\/0.0.0.0:26656"/pprof_laddr = "tcp:\/\/0.0.0.0:36656"/' ${NodeDic[1]}/config/config.toml
+sed -i 's/prometheus_listen_addr = ":26660"/prometheus_listen_addr = ":36660"/' ${NodeDic[1]}/config/config.toml
+
+sed -i 's/address = "tcp:\/\/0.0.0.0:1317"/address = "tcp:\/\/0.0.0.0:41317"/' ${NodeDic[2]}/config/app.toml
+sed -i 's/address = ":8080"/address = ":48080"/' ${NodeDic[2]}/config/app.toml
+sed -i 's/address = "0.0.0.0:9090"/address = "0.0.0.0:49090"/' ${NodeDic[2]}/config/app.toml
+sed -i 's/address = "0.0.0.0:9091"/address = "0.0.0.0:49091"/' ${NodeDic[2]}/config/app.toml
+sed -i 's/address = "0.0.0.0:8545"/address = "0.0.0.0:48545"/' ${NodeDic[2]}/config/app.toml
+sed -i 's/ws-address = "0.0.0.0:8546"/ws-address = "0.0.0.0:48546"/' ${NodeDic[2]}/config/app.toml
+sed -i 's/proxy_app = "tcp:\/\/127.0.0.1:26658"/proxy_app = "tcp:\/\/127.0.0.1:46658"/' ${NodeDic[2]}/config/config.toml
+sed -i 's/laddr = "tcp:\/\/0.0.0.0:26657"/proxy_app = "tcp:\/\/0.0.0.0:46657"/' ${NodeDic[2]}/config/config.toml
+sed -i 's/pprof_laddr = "localhost:6060"/pprof_laddr = "localhost:46060"/' ${NodeDic[2]}/config/config.toml
+sed -i 's/laddr = "tcp:\/\/0.0.0.0:26656"/pprof_laddr = "tcp:\/\/0.0.0.0:46656"/' ${NodeDic[2]}/config/config.toml
+sed -i 's/prometheus_listen_addr = ":26660"/prometheus_listen_addr = ":46660"/' ${NodeDic[2]}/config/config.toml
+
+sed -i 's/address = "tcp:\/\/0.0.0.0:1317"/address = "tcp:\/\/0.0.0.0:51317"/' ${NodeDic[3]}/config/app.toml
+sed -i 's/address = ":8080"/address = ":58080"/' ${NodeDic[3]}/config/app.toml
+sed -i 's/address = "0.0.0.0:9090"/address = "0.0.0.0:59090"/' ${NodeDic[3]}/config/app.toml
+sed -i 's/address = "0.0.0.0:9091"/address = "0.0.0.0:59091"/' ${NodeDic[3]}/config/app.toml
+sed -i 's/address = "0.0.0.0:8545"/address = "0.0.0.0:58545"/' ${NodeDic[3]}/config/app.toml
+sed -i 's/ws-address = "0.0.0.0:8546"/ws-address = "0.0.0.0:58546"/' ${NodeDic[3]}/config/app.toml
+sed -i 's/proxy_app = "tcp:\/\/127.0.0.1:26658"/proxy_app = "tcp:\/\/127.0.0.1:56658"/' ${NodeDic[3]}/config/config.toml
+sed -i 's/laddr = "tcp:\/\/0.0.0.0:26657"/proxy_app = "tcp:\/\/0.0.0.0:56657"/' ${NodeDic[3]}/config/config.toml
+sed -i 's/pprof_laddr = "localhost:6060"/pprof_laddr = "localhost:56060"/' ${NodeDic[3]}/config/config.toml
+sed -i 's/laddr = "tcp:\/\/0.0.0.0:26656"/pprof_laddr = "tcp:\/\/0.0.0.0:56656"/' ${NodeDic[3]}/config/config.toml
+sed -i 's/prometheus_listen_addr = ":26660"/prometheus_listen_addr = ":56660"/' ${NodeDic[3]}/config/config.toml
+
+
+
+
 #./build/irita start --pruning=nothing --home=./testnet/node0
+#./build/irita start --pruning=nothing --home=./testnet/node1
+#./build/irita start --pruning=nothing --home=./testnet/node2
+#./build/irita start --pruning=nothing --home=./testnet/node3
