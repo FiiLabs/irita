@@ -20,10 +20,17 @@ Inter-Realm Industry Trust Alliance(**IRITA**) is **the 1st enterprise-level per
 
 make build
 
-2.启动单节点本地测试网
+2.启动单节点本地测试网（自动启动节点）
 
 bash ./scripts/single-node.sh
 
-2.启动四节点本地测试网(暂时需要手动修改各节点端口)
+2.启动四节点本地测试网
 
 bash ./scripts/four-node.sh
+
+运行节点
+
+./build/irita start --pruning=nothing --home=./testnet/node0
+./build/irita start --pruning=nothing --home=./testnet/node1
+./build/irita start --pruning=nothing --home=./testnet/node2
+./build/irita start --pruning=nothing --home=./testnet/node3
