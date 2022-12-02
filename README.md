@@ -26,6 +26,8 @@ cd openssl && ./config
 
 sudo make install
 
+3.安装 jq
+
 编译运行节点
 
 1.编译源码
