@@ -185,3 +185,7 @@ CRITICAL please submit the following transaction:
 就可以在ubuntu 20.04的环境里面运行，所以我把Dockerfile里面的golang版本和ubuntu的版本都升级到跟我本机编译开发环境保持一致，
 
 最后运行docker compose的时候，节点就没有报错了，并且4个validators节点正常出块，并且同一高度的block的hash是一致的。
+
+其实Dockerfile还可以优化，直接把golang的alpine Linux版本删除，在ubuntu上构建项目，他们文昌链为什么会这样做，用Alpine Linux编译，然后拷贝到
+ubuntu上，是因为golang的官方Docker镜像就是推荐用Alpine Linux的镜像版本，而且他们想用musl编译项目，让irita的二进制全静态，不依赖任何动态库，所以
+Dockerfile里面又要下载muslc的静态库.a文件之类的，搞得很烦人。其实完全不必这么麻烦，都容器运行了，动态静态无所谓，所以可以考虑改天优化掉。
