@@ -169,3 +169,19 @@ openssl: error while loading shared libraries: libssl.so.3: cannot open shared o
 ```
 
 以上错误， 解决方案就是`sudo ldconfig /usr/local/lib64` https://stackoverflow.com/questions/54124906/openssl-error-while-loading-shared-libraries-libssl-so-3 
+
+## TroubleShooting
+
+之前用Docker compose运行4 validators的本地节点网络，节点内部的`crisis`模块的日志报出 `keeper.Keeper.AssetInvariants`的错误，
+
+还提示:
+
+```txt
+CRITICAL please submit the following transaction:
+   tx crisis invariant-borken bank total-supply
+```
+
+然后我发现了是SDK的这个模块的BUG，但是没追究其原因，我又看了下，感觉`go.mod`里面的sdk版本是包含了这些Fixs的。但是我本机，不在容器里面编译
+就可以在ubuntu 20.04的环境里面运行，所以我把Dockerfile里面的golang版本和ubuntu的版本都升级到跟我本机编译开发环境保持一致，
+
+最后运行docker compose的时候，节点就没有报错了，并且4个validators节点正常出块，并且同一高度的block的hash是一致的。
