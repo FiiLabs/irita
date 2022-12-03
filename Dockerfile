@@ -1,9 +1,9 @@
 #
 # Build image: docker build -t bianjie/irita .
 #
-FROM golang:1.17.3-alpine3.14 as builder
+FROM golang:1.19.3-alpine3.17 as builder
 
-RUN echo -e http://mirrors.ustc.edu.cn/alpine/v3.12/main/ > /etc/apk/repositories
+RUN echo -e http://mirrors.ustc.edu.cn/alpine/v3.17/main/ > /etc/apk/repositories
 # this comes from standard alpine nightly file
 #  https://github.com/rust-lang/docker-rust-nightly/blob/master/alpine3.12/Dockerfile
 # with some changes to support CosmWasm toolchain, etc
@@ -31,13 +31,13 @@ RUN sha256sum /lib/libwasmvm_muslc.a | grep ef294a7a53c8d0aa6a8da4b10e94fb9f053f
 
 RUN go env -w GOPROXY=https://goproxy.cn
 RUN LEDGER_ENABLED=false BUILD_TAGS=muslc make build
-
+RUN apk del $PACKAGES
 # ----------------------------
 
 FROM ubuntu:20.04
 
 # Set up dependencies
-ENV PACKAGES make gcc perl wget
+ENV PACKAGES build-essential perl wget
 
 WORKDIR /
 
