@@ -1,4 +1,4 @@
-module github.com/bianjieai/irita
+module github.com/FiiLabs/irita
 
 go 1.17
 
