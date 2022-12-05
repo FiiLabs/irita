@@ -142,7 +142,7 @@ openssl x509 -req -in req.csr -out node0.crt -sm3 -sigopt "distid:12345678123456
 # 导入 IRITA 网络的企业根证书(需要先获取根证书)
 irita set-root-cert root.crt --home=testnet
 
-# 添加 node0 到 genesis.json 文件  这里会报错 Error: node0.info: key not found，https://github.com/bianjieai/irita/issues/188
+# 添加 node0 到 genesis.json 文件 
 irita add-genesis-validator --name mathxh --cert node0.crt --power 100 --home=testnet --from mathxh
 
 # 启动
