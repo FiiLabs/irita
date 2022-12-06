@@ -1,7 +1,7 @@
 #!/bin/sh
 Home=./testnet
 ChainID=testnet # chain-id
-ChainCMD=./build/irita
+ChainCMD=irita
 NodeName=irita-node # node name
 NodeIP=(tcp://127.0.0.1 tcp://127.0.0.1 tcp://127.0.0.1 tcp://127.0.0.1)
 NodeNames=("node0" "node1" "node2" "node3")
