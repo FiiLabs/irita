@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/cosmos/cosmos-sdk/server"
@@ -9,16 +8,14 @@ import (
 
 	"github.com/bianjieai/irita/app"
 	"github.com/bianjieai/irita/cmd/irita/cmd"
-
-	"net/http"
-	_ "net/http/pprof"
+	//_ "net/http/pprof"
 )
 
 func main() {
 
-	go func() {
-		fmt.Println(http.ListenAndServe("localhost:6060", nil))
-	}()
+	// go func() {
+	// 	fmt.Println(http.ListenAndServe("localhost:6060", nil))
+	// }()
 
 	rootCmd, _ := cmd.NewRootCmd()
 	if err := svrcmd.Execute(rootCmd, app.DefaultNodeHome); err != nil {
