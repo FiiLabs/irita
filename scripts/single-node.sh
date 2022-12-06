@@ -20,6 +20,9 @@ Point=upoint
 PointOwner=iaa1g6gqr3s58dhw3jq5hm95qrng0sa9um7gavevjc # replace with actual address
 PointToken=$(echo \{\"symbol\": \"point\", \"name\": \"Irita point native token\", \"scale\": 6, \"min_unit\": \"upoint\", \"initial_supply\": \"1000000000\", \"max_supply\": \"1000000000000\", \"mintable\": true, \"owner\": \"${PointOwner}\"\})
 
+rm -rf "$Home"
+rm -rf /home/mathxh/.irita
+
 $ChainCMD keys delete admin -y
 $ChainCMD keys delete validator0 -y
 bash -c "printf \"${Mnemonics[4]}\n12345678\n12345678\n\" | ${ChainCMD} keys add admin --recover --home=$Home"
