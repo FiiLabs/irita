@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 Home=./testnet
 ChainID=testnet # chain-id
 ChainCMD=irita
@@ -22,7 +22,14 @@ Point=upoint
 PointOwner=iaa1g6gqr3s58dhw3jq5hm95qrng0sa9um7gavevjc # replace with actual address
 PointToken=`echo {\"symbol\": \"point\", \"name\": \"Irita point native token\", \"scale\": 6, \"min_unit\": \"upoint\", \"initial_supply\": \"1000000000\", \"max_supply\": \"1000000000000\", \"mintable\": true, \"owner\": \"${PointOwner}\"}`
 
+rm -rf "$Home"
+rm -rf /home/mathxh/.irita
+
 $ChainCMD keys delete admin -y
+$ChainCMD keys delete validator0 -y
+$ChainCMD keys delete validator1 -y
+$ChainCMD keys delete validator2 -y
+$ChainCMD keys delete validator3 -y
 
 for i in `seq 0 $[ ${#Validators[*]} -1 ]`; do $ChainCMD keys delete ${Validators[$i]} -y; done
 
