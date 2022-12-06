@@ -25,8 +25,21 @@ rm -rf /home/mathxh/.irita
 
 $ChainCMD keys delete admin -y
 $ChainCMD keys delete validator0 -y
-bash -c "printf \"${Mnemonics[4]}\n12345678\n12345678\n\" | ${ChainCMD} keys add admin --recover --home=$Home"
-bash -c "printf \"${Mnemonics[0]}\n12345678\n12345678\n\" | ${ChainCMD} keys add validator0 --recover --home=$Home"
+# bash -c "printf \"${Mnemonics[4]}\n12345678\n12345678\n\" | ${ChainCMD} keys add admin --recover --home=$Home"
+# bash -c "printf \"${Mnemonics[0]}\n12345678\n12345678\n\" | ${ChainCMD} keys add validator0 --recover --home=$Home"
+
+admin_secret_info="${Mnemonics[4]}
+12345678
+12345678
+"
+
+validator0_secret_info="${Mnemonics[0]}
+12345678
+12345678
+"
+
+${ChainCMD} keys add admin --recover --home=$Home <<< "${admin_secret_info}"
+${ChainCMD}  keys add validator0 --recover --home=$Home <<< "${validator0_secret_info}"
 
 $ChainCMD init moniker --chain-id $ChainID --home=$Home
 
