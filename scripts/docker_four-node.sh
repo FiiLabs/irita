@@ -26,7 +26,7 @@ $ChainCMD keys delete admin -y
 
 for i in `seq 0 $[ ${#Validators[*]} -1 ]`; do $ChainCMD keys delete ${Validators[$i]} -y; done
 
-bash -c "echo -e \"${Mnemonics[4]}\n12345678\n12345678\" | ${ChainCMD} keys add admin --recover"
+bash -c "echo -e \"${Mnemonics[4]}\n12345678\n12345678\" | ${ChainCMD} keys add admin --recover --home=$Home"
 
 for i in `seq 0 $[ ${#Validators[*]} -1 ]`; do bash -c "echo -e \"${Mnemonics[$i]}\n12345678\n12345678\" | ${ChainCMD} keys add ${Validators[$i]} --recover --home=${NodeDic[$i]}"; done
 
@@ -43,11 +43,9 @@ sed -i 's/addr_book_strict = true/addr_book_strict = false/' $Home/config/config
 
 sed -i 's/timeout_commit = "5s"/timeout_commit = "2s"/' $Home/config/config.toml
 
-sed -i 's/allow_duplicate_ip = false/allow_duplicate_ip = true/' $Home/config/config.toml
-
 sed -i 's/minimum-gas-prices = ""/minimum-gas-prices = "1uirita"/' $Home/config/app.toml
 
-#sed -i 's/filter_peers = false/filter_peers = true/' $Home/config/config.toml
+sed -i 's/filter_peers = false/filter_peers = true/' $Home/config/config.toml
 
 sed -i "s/stake/$Stake/g" $Home/config/genesis.json
 
@@ -101,7 +99,9 @@ for i in `seq 0 $[ ${#Validators[*]} -1 ]`; do echo -e "CN\nSH\nSH\nIT\nDEV\n'${
 for i in `seq 0 $[ ${#Validators[*]} -1 ]`; do openssl x509 -req -in ${NodeDic[$i]}/node_req.csr -out ${NodeDic[$i]}/node.crt -sm3 -sigopt "distid:1234567812345678" -vfyopt "distid:1234567812345678" -CA $Home/root.crt -CAkey $Home/root.key -CAcreateserial; done
 
 bash -c "echo 12345678 | $ChainCMD add-genesis-validator --name ${NodeNames[0]} --cert ${NodeDic[0]}/validator.crt --power 10000 --from validator0 --home=$Home"
-
+#bash -c "echo 12345678 | $ChainCMD add-genesis-validator --name ${NodeNames[1]} --cert ${NodeDic[1]}/validator.crt --power 10000 --from validator1 --home=$Home"
+#bash -c "echo 12345678 | $ChainCMD add-genesis-validator --name ${NodeNames[2]} --cert ${NodeDic[2]}/validator.crt --power 10000 --from validator2 --home=$Home"
+#bash -c "echo 12345678 | $ChainCMD add-genesis-validator --name ${NodeNames[3]} --cert ${NodeDic[3]}/validator.crt --power 10000 --from validator3 --home=$Home"
 
 #sed -i "s/persistent_peers = \"\"/persistent_peers = \"$($ChainCMD tendermint show-node-id --home=${NodeDic[0]} | sed 's/\^M\$//')@`echo ${NodeIP[0]} | awk -F // '{print $2}'`:26656,$($ChainCMD tendermint show-node-id --home=${NodeDic[1]} | sed 's/\^M\$//')@`echo ${NodeIP[0]} | awk -F // '{print $2}'`:36656,$($ChainCMD tendermint show-node-id --home=${NodeDic[2]} | sed 's/\^M\$//')@`echo ${NodeIP[0]} | awk -F // '{print $2}'`:46656,$($ChainCMD tendermint show-node-id --home=${NodeDic[3]} | sed 's/\^M\$//')@`echo ${NodeIP[0]} | awk -F // '{print $2}'`:56656\"/" $Home/config/config.toml
 sed -i "s/persistent_peers = \"\"/persistent_peers = \"$($ChainCMD tendermint show-node-id --home=${NodeDic[0]} | sed 's/\^M\$//')@`echo ${NodeIP[0]} | awk -F // '{print $2}'`:26656\"/" $Home/config/config.toml
@@ -115,38 +115,4 @@ for i in `seq 0 $[ ${#Validators[*]} -1 ]`; do cp $Home/config/config.toml ${Nod
 for i in `seq 0 $[ ${#Validators[*]} -1 ]`; do cp $Home/config/genesis.json ${NodeDic[$i]}/config; done
 for i in `seq 0 $[ ${#Validators[*]} -1 ]`; do cp $Home/config/app.toml ${NodeDic[$i]}/config; done
 
-sed -i 's/address = "tcp:\/\/0.0.0.0:1317"/address = "tcp:\/\/0.0.0.0:31317"/' ${NodeDic[1]}/config/app.toml
-sed -i 's/address = ":8080"/address = ":38080"/' ${NodeDic[1]}/config/app.toml
-sed -i 's/address = "0.0.0.0:9090"/address = "0.0.0.0:39090"/' ${NodeDic[1]}/config/app.toml
-sed -i 's/address = "0.0.0.0:9091"/address = "0.0.0.0:39091"/' ${NodeDic[1]}/config/app.toml
-sed -i 's/address = "0.0.0.0:8545"/address = "0.0.0.0:38545"/' ${NodeDic[1]}/config/app.toml
-sed -i 's/ws-address = "0.0.0.0:8546"/ws-address = "0.0.0.0:38546"/' ${NodeDic[1]}/config/app.toml
-sed -i 's/proxy_app = "tcp:\/\/127.0.0.1:26658"/proxy_app = "tcp:\/\/127.0.0.1:36658"/' ${NodeDic[1]}/config/config.toml
-sed -i 's/laddr = "tcp:\/\/0.0.0.0:26657"/proxy_app = "tcp:\/\/0.0.0.0:36657"/' ${NodeDic[1]}/config/config.toml
-sed -i 's/pprof_laddr = "localhost:6060"/pprof_laddr = "localhost:36060"/' ${NodeDic[1]}/config/config.toml
-sed -i 's/laddr = "tcp:\/\/0.0.0.0:26656"/pprof_laddr = "tcp:\/\/0.0.0.0:36656"/' ${NodeDic[1]}/config/config.toml
-sed -i 's/prometheus_listen_addr = ":26660"/prometheus_listen_addr = ":36660"/' ${NodeDic[1]}/config/config.toml
-
-sed -i 's/address = "tcp:\/\/0.0.0.0:1317"/address = "tcp:\/\/0.0.0.0:41317"/' ${NodeDic[2]}/config/app.toml
-sed -i 's/address = ":8080"/address = ":48080"/' ${NodeDic[2]}/config/app.toml
-sed -i 's/address = "0.0.0.0:9090"/address = "0.0.0.0:49090"/' ${NodeDic[2]}/config/app.toml
-sed -i 's/address = "0.0.0.0:9091"/address = "0.0.0.0:49091"/' ${NodeDic[2]}/config/app.toml
-sed -i 's/address = "0.0.0.0:8545"/address = "0.0.0.0:48545"/' ${NodeDic[2]}/config/app.toml
-sed -i 's/ws-address = "0.0.0.0:8546"/ws-address = "0.0.0.0:48546"/' ${NodeDic[2]}/config/app.toml
-sed -i 's/proxy_app = "tcp:\/\/127.0.0.1:26658"/proxy_app = "tcp:\/\/127.0.0.1:46658"/' ${NodeDic[2]}/config/config.toml
-sed -i 's/laddr = "tcp:\/\/0.0.0.0:26657"/proxy_app = "tcp:\/\/0.0.0.0:46657"/' ${NodeDic[2]}/config/config.toml
-sed -i 's/pprof_laddr = "localhost:6060"/pprof_laddr = "localhost:46060"/' ${NodeDic[2]}/config/config.toml
-sed -i 's/laddr = "tcp:\/\/0.0.0.0:26656"/pprof_laddr = "tcp:\/\/0.0.0.0:46656"/' ${NodeDic[2]}/config/config.toml
-sed -i 's/prometheus_listen_addr = ":26660"/prometheus_listen_addr = ":46660"/' ${NodeDic[2]}/config/config.toml
-
-sed -i 's/address = "tcp:\/\/0.0.0.0:1317"/address = "tcp:\/\/0.0.0.0:51317"/' ${NodeDic[3]}/config/app.toml
-sed -i 's/address = ":8080"/address = ":58080"/' ${NodeDic[3]}/config/app.toml
-sed -i 's/address = "0.0.0.0:9090"/address = "0.0.0.0:59090"/' ${NodeDic[3]}/config/app.toml
-sed -i 's/address = "0.0.0.0:9091"/address = "0.0.0.0:59091"/' ${NodeDic[3]}/config/app.toml
-sed -i 's/address = "0.0.0.0:8545"/address = "0.0.0.0:58545"/' ${NodeDic[3]}/config/app.toml
-sed -i 's/ws-address = "0.0.0.0:8546"/ws-address = "0.0.0.0:58546"/' ${NodeDic[3]}/config/app.toml
-sed -i 's/proxy_app = "tcp:\/\/127.0.0.1:26658"/proxy_app = "tcp:\/\/127.0.0.1:56658"/' ${NodeDic[3]}/config/config.toml
-sed -i 's/laddr = "tcp:\/\/0.0.0.0:26657"/proxy_app = "tcp:\/\/0.0.0.0:56657"/' ${NodeDic[3]}/config/config.toml
-sed -i 's/pprof_laddr = "localhost:6060"/pprof_laddr = "localhost:56060"/' ${NodeDic[3]}/config/config.toml
-sed -i 's/laddr = "tcp:\/\/0.0.0.0:26656"/pprof_laddr = "tcp:\/\/0.0.0.0:56656"/' ${NodeDic[3]}/config/config.toml
-sed -i 's/prometheus_listen_addr = ":26660"/prometheus_listen_addr = ":56660"/' ${NodeDic[3]}/config/config.toml
+#docker  run -itd -p26656:26656 -p26657:26657 -p9090:9090 --mount type=bind,source=./testnet,destination=./testnet --name node0 bianjie/irita $ChainCMD start --pruning=nothing --home=./testnet/node0
