@@ -1,7 +1,7 @@
-#!/bin/sh
+#!/usr/bin/env bash
 Home=./testnet
 ChainID=testnet # chain-id
-ChainCMD=./build/irita
+ChainCMD=irita
 NodeName=irita-node # node name
 NodeIP=(tcp://127.0.0.1 tcp://127.0.0.1 tcp://127.0.0.1 tcp://127.0.0.1)
 NodeNames=("node0" "node1" "node2" "node3")
@@ -13,17 +13,17 @@ Mnemonics=("eagle marriage host height topple sorry exist nation screen affair b
 )
 Stake=uirita
 TotalStake=10000000000000000${Stake} # total stake in genesis
-SendStake=10000000000000${Stake}
-DataPath=/tmp
+# SendStake=10000000000000${Stake}
+# DataPath=/tmp
 
 Point=upoint
 PointOwner=iaa1g6gqr3s58dhw3jq5hm95qrng0sa9um7gavevjc # replace with actual address
-PointToken=`echo {\"symbol\": \"point\", \"name\": \"Irita point native token\", \"scale\": 6, \"min_unit\": \"upoint\", \"initial_supply\": \"1000000000\", \"max_supply\": \"1000000000000\", \"mintable\": true, \"owner\": \"${PointOwner}\"}`
+PointToken=$(echo \{\"symbol\": \"point\", \"name\": \"Irita point native token\", \"scale\": 6, \"min_unit\": \"upoint\", \"initial_supply\": \"1000000000\", \"max_supply\": \"1000000000000\", \"mintable\": true, \"owner\": \"${PointOwner}\"\})
 
 $ChainCMD keys delete admin -y
 $ChainCMD keys delete validator0 -y
-bash -c "echo -e \"${Mnemonics[4]}\n12345678\n12345678\" | ${ChainCMD} keys add admin --recover --home=$Home"
-bash -c "echo -e \"${Mnemonics[0]}\n12345678\n12345678\" | ${ChainCMD} keys add validator0 --recover --home=$Home"
+bash -c "printf \"${Mnemonics[4]}\n12345678\n12345678\n\" | ${ChainCMD} keys add admin --recover --home=$Home"
+bash -c "printf \"${Mnemonics[0]}\n12345678\n12345678\n\" | ${ChainCMD} keys add validator0 --recover --home=$Home"
 
 $ChainCMD init moniker --chain-id $ChainID --home=$Home
 
