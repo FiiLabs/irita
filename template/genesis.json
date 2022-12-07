@@ -1,0 +1,301 @@
+{
+  "genesis_time": "2022-12-07T07:17:26.484919335Z",
+  "chain_id": "testnet",
+  "initial_height": "1",
+  "consensus_params": {
+    "block": {
+      "max_bytes": "22020096",
+      "max_gas": "-1",
+      "time_iota_ms": "1000"
+    },
+    "evidence": {
+      "max_age_num_blocks": "100000",
+      "max_age_duration": "172800000000000",
+      "max_bytes": "1048576"
+    },
+    "validator": {
+      "pub_key_types": [
+        "sm2"
+      ]
+    },
+    "version": {}
+  },
+  "app_hash": "",
+  "app_state": {
+    "MT": null,
+    "NFT": null,
+    "auth": {
+      "params": {
+        "max_memo_characters": "256",
+        "tx_sig_limit": "7",
+        "tx_size_cost_per_byte": "10",
+        "sig_verify_cost_ed25519": "590",
+        "sig_verify_cost_secp256k1": "1000",
+        "sig_verify_cost_sm2": "7850"
+      },
+      "accounts": [
+        {
+          "@type": "/cosmos.auth.v1beta1.BaseAccount",
+          "address": "iaa18har3mgs2u549y4mlw38eaajt43t5kxuedrcra",
+          "pub_key": null,
+          "account_number": "0",
+          "sequence": "0"
+        },
+        {
+          "@type": "/cosmos.auth.v1beta1.BaseAccount",
+          "address": "iaa1g6gqr3s58dhw3jq5hm95qrng0sa9um7gavevjc",
+          "pub_key": null,
+          "account_number": "0",
+          "sequence": "0"
+        }
+      ]
+    },
+    "bank": {
+      "params": {
+        "send_enabled": [],
+        "default_send_enabled": true
+      },
+      "balances": [
+        {
+          "address": "iaa18har3mgs2u549y4mlw38eaajt43t5kxuedrcra",
+          "coins": [
+            {
+              "denom": "uirita",
+              "amount": "10000000000000000"
+            }
+          ]
+        },
+        {
+          "address": "iaa1g6gqr3s58dhw3jq5hm95qrng0sa9um7gavevjc",
+          "coins": [
+            {
+              "denom": "upoint",
+              "amount": "1000000000000000"
+            }
+          ]
+        }
+      ],
+      "supply": [],
+      "denom_metadata": []
+    },
+    "crisis": {
+      "constant_fee": {
+        "denom": "uirita",
+        "amount": "1000000000"
+      }
+    },
+    "evidence": {
+      "evidence": []
+    },
+    "evm": {
+      "accounts": [],
+      "params": {
+        "evm_denom": "ugas",
+        "enable_create": true,
+        "enable_call": true,
+        "extra_eips": [],
+        "chain_config": {
+          "homestead_block": "0",
+          "dao_fork_block": "0",
+          "dao_fork_support": true,
+          "eip150_block": "0",
+          "eip150_hash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "eip155_block": "0",
+          "eip158_block": "0",
+          "byzantium_block": "0",
+          "constantinople_block": "0",
+          "petersburg_block": "0",
+          "istanbul_block": "0",
+          "muir_glacier_block": "0",
+          "berlin_block": "0",
+          "london_block": "0",
+          "arrow_glacier_block": "0",
+          "merge_fork_block": "0"
+        }
+      }
+    },
+    "feegrant": {
+      "allowances": []
+    },
+    "feemarket": {
+      "params": {
+        "no_base_fee": false,
+        "base_fee_change_denominator": 8,
+        "elasticity_multiplier": 2,
+        "enable_height": "0",
+        "base_fee": "1000000000"
+      },
+      "block_gas": "0"
+    },
+    "genutil": {
+      "gen_txs": []
+    },
+    "identity": {
+      "identities": []
+    },
+    "mt": {
+      "collections": [],
+      "owners": []
+    },
+    "nft": {
+      "collections": []
+    },
+    "node": {
+      "root_cert": "-----BEGIN CERTIFICATE-----\nMIIB/DCCAaOgAwIBAgIUeZT5rCv430p29nopSwR32Wiy/sUwCgYIKoEcz1UBg3Uw\nVDELMAkGA1UEBhMCQ04xCzAJBgNVBAgMAlNIMQswCQYDVQQHDAJTSDELMAkGA1UE\nCgwCSVQxDDAKBgNVBAsMA0RFVjEQMA4GA1UEAwwHJ25vZGUwJzAeFw0yMjEyMDcw\nNzE3NDJaFw0zMjEyMDQwNzE3NDJaMFQxCzAJBgNVBAYTAkNOMQswCQYDVQQIDAJT\nSDELMAkGA1UEBwwCU0gxCzAJBgNVBAoMAklUMQwwCgYDVQQLDANERVYxEDAOBgNV\nBAMMBydub2RlMCcwWTATBgcqhkjOPQIBBggqgRzPVQGCLQNCAASuyIz6ZwlyE7Re\nI+IUVv+gQPE6zEzh48OuXFOqj4VdRZbiOBgKWL7kZfF8vvINphH9C9wYDfBv5Wxa\nYZT23VR4o1MwUTAdBgNVHQ4EFgQUnTyAeXj2FtFEMwjOeL/Wo0n7UKIwHwYDVR0j\nBBgwFoAUnTyAeXj2FtFEMwjOeL/Wo0n7UKIwDwYDVR0TAQH/BAUwAwEB/zAKBggq\ngRzPVQGDdQNHADBEAiBQWQ0VLDvBIBPiXitsgfFaiEvgGc3lqFuBjSdSdwBbtQIg\nB1tpGN8LFxij6HwPzqCWR1tgFIwHUlrYgsE87CguazM=\n-----END CERTIFICATE-----\n",
+      "params": {
+        "historical_entries": 100
+      },
+      "validators": [
+        {
+          "id": "3E2A6DEA42C1BA8EF7C0ED17ECAC93FB9F0294480A26CA407BF743785F3D89E5",
+          "name": "node0",
+          "pubkey": "icp107c6v33pqfx0gwpjr4g2p9sxah5v7s8rp2sk27wg25s8nm74ja7d25d0e7ra5ee2llx",
+          "certificate": "-----BEGIN CERTIFICATE-----\nMIIBojCCAUkCFC2pB1ntxkRJ+3bDhVAUyrMxY/jHMAoGCCqBHM9VAYN1MFQxCzAJ\nBgNVBAYTAkNOMQswCQYDVQQIDAJTSDELMAkGA1UEBwwCU0gxCzAJBgNVBAoMAklU\nMQwwCgYDVQQLDANERVYxEDAOBgNVBAMMBydub2RlMCcwHhcNMjIxMjA3MDcxNzQy\nWhcNMjMwMTA2MDcxNzQyWjBUMQswCQYDVQQGEwJDTjELMAkGA1UECAwCU0gxCzAJ\nBgNVBAcMAlNIMQswCQYDVQQKDAJJVDEMMAoGA1UECwwDREVWMRAwDgYDVQQDDAcn\nbm9kZTAnMFkwEwYHKoZIzj0CAQYIKoEcz1UBgi0DQgAETPQ4Mh1QoJYG7ejPQOMK\noWV5yFUgee/Vl3zVUa/Ph9pgXmuqpoJZka/wJICsiQOrZBrWCpUAtNNDdltK4jch\nvjAKBggqgRzPVQGDdQNHADBEAiBYyOB0btCyNoRTehOR3vrA70otzABpdP8pKLbE\nJWRQqgIgEr3byYehvaPUeThHPNoya6F9eMuyH4mpw3LfKx3NkZM=\n-----END CERTIFICATE-----\n",
+          "power": "10000",
+          "description": "",
+          "jailed": false,
+          "operator": "iaa18har3mgs2u549y4mlw38eaajt43t5kxuedrcra"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "fd0613864befceee4ee60246c8051d55d6dbc526",
+          "name": "irita-node",
+          "certificate": ""
+        }
+      ]
+    },
+    "opb": {
+      "params": {
+        "base_token_denom": "uirita",
+        "point_token_denom": "upoint",
+        "base_token_manager": "iaa18har3mgs2u549y4mlw38eaajt43t5kxuedrcra",
+        "unrestricted_token_transfer": true
+      }
+    },
+    "oracle": {
+      "entries": []
+    },
+    "params": null,
+    "perm": {
+      "role_accounts": [
+        {
+          "address": "iaa18har3mgs2u549y4mlw38eaajt43t5kxuedrcra",
+          "roles": [
+            "ROOT_ADMIN"
+          ]
+        }
+      ],
+      "black_list": [],
+      "contract_deny_list": []
+    },
+    "random": {
+      "pending_random_requests": {}
+    },
+    "record": {
+      "records": []
+    },
+    "service": {
+      "params": {
+        "max_request_timeout": "100",
+        "min_deposit_multiple": "1000",
+        "min_deposit": [
+          {
+            "denom": "upoint",
+            "amount": "5000000000"
+          }
+        ],
+        "service_fee_tax": "0.050000000000000000",
+        "slash_fraction": "0.001000000000000000",
+        "complaint_retrospect": "1296000s",
+        "arbitration_time_limit": "432000s",
+        "tx_size_limit": "4000",
+        "base_denom": "upoint",
+        "restricted_service_fee_denom": true
+      },
+      "definitions": [],
+      "bindings": [],
+      "withdraw_addresses": {},
+      "request_contexts": {}
+    },
+    "slashing": {
+      "params": {
+        "signed_blocks_window": "100",
+        "min_signed_per_window": "0.500000000000000000",
+        "downtime_jail_duration": "600s",
+        "slash_fraction_double_sign": "0.050000000000000000",
+        "slash_fraction_downtime": "0.010000000000000000"
+      },
+      "signing_infos": [],
+      "missed_blocks": []
+    },
+    "tibc": {
+      "client_genesis": {
+        "clients": [],
+        "clients_consensus": [],
+        "clients_metadata": [],
+        "native_chain_name": "tibc-test",
+        "relayers": []
+      },
+      "packet_genesis": {
+        "acknowledgements": [],
+        "commitments": [],
+        "receipts": [],
+        "send_sequences": [],
+        "recv_sequences": [],
+        "ack_sequences": []
+      },
+      "routing_genesis": {
+        "rules": []
+      }
+    },
+    "token": {
+      "params": {
+        "token_tax_rate": "1",
+        "issue_token_base_fee": {
+          "denom": "point",
+          "amount": "60000"
+        },
+        "mint_token_fee_ratio": "0.100000000000000000"
+      },
+      "tokens": [
+        {
+          "symbol": "irita",
+          "name": "Irita base native token",
+          "scale": 6,
+          "min_unit": "uirita",
+          "initial_supply": "1000000000",
+          "max_supply": "18446744073709551615",
+          "mintable": true,
+          "owner": ""
+        },
+        {
+          "symbol": "point",
+          "name": "Irita point native token",
+          "scale": 6,
+          "min_unit": "upoint",
+          "initial_supply": "1000000000",
+          "max_supply": "1000000000000",
+          "mintable": true,
+          "owner": "iaa1g6gqr3s58dhw3jq5hm95qrng0sa9um7gavevjc"
+        }
+      ],
+      "burned_coins": []
+    },
+    "upgrade": {},
+    "wasm": {
+      "params": {
+        "code_upload_access": {
+          "permission": "Everybody",
+          "address": ""
+        },
+        "instantiate_default_permission": "Everybody",
+        "max_wasm_code_size": "1228800"
+      },
+      "codes": [],
+      "contracts": [],
+      "sequences": [],
+      "gen_msgs": []
+    }
+  }
+}
