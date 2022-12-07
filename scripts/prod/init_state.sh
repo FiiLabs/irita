@@ -116,6 +116,7 @@ for i in {0..3}; do
     cp "$Home/config/app.toml" "${NodeDic[$i]}/config";
 done
 
+# Change validator 1 - 3's config files
 for i in {1..3}; do
     port_prefix=$(($i + 2))
     
