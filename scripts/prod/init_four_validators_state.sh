@@ -3,7 +3,7 @@
 HomeUserPath=/home/mathxh
 Home=./testnet
 ChainID=testnet # chain-id
-ChainCMD=irita
+ChainCMD="irita"
 NodeName=irita-node # node name
 NodeIP=(tcp://127.0.0.1 tcp://127.0.0.1 tcp://127.0.0.1 tcp://127.0.0.1)
 NodeNames=("node0" "node1" "node2" "node3")
@@ -23,21 +23,27 @@ Point=upoint
 PointOwner=iaa1g6gqr3s58dhw3jq5hm95qrng0sa9um7gavevjc # replace with actual address, this is admin address
 PointToken="{\"symbol\": \"point\", \"name\": \"Irita point native token\", \"scale\": 6, \"min_unit\": \"upoint\", \"initial_supply\": \"1000000000\", \"max_supply\": \"1000000000000\", \"mintable\": true, \"owner\": \"${PointOwner}\"}"
 Password=12345678
+# https://docs.cosmos.network/v0.46/run-node/keyring.html
+KeyRingBackEndType="os"
 
 echo "Homeuser Path is ${HomeUserPath}"
 
-rm -rf "$Home"
-rm -rf "${HomeUserPath}/.irita"
+sudo rm -rf "$Home"
+sudo rm -rf "${HomeUserPath}/.irita"
+sudo rm -rf "root/.irita"
+
+$ChainCMD config keyring-backend $KeyRingBackEndType
 
 $ChainCMD keys delete admin -y
-
 # delete all validators related keys
 for i in {0..3}; do  
    $ChainCMD keys delete "${Validators[$i]}" -y --home "${NodeDic[$i]}"
 done
 
 # Add related accounts
-echo -e "${Mnemonics[4]}\n${Password}\n${Password}" | ${ChainCMD} keys add admin --recover
+(echo "${Mnemonics[4]}"; echo "${Password}") | ${ChainCMD} keys add admin --recover
+# (echo "setup capital exact dad minimum pigeon blush claw cake find animal torch cry guide dirt settle parade host grief lunar indicate laptop bulk cherry"; echo "12345678", echo "12345678") | sudo -E irita keys add admin --recover
+# (echo "12345678"; echo "12345678") | sudo -E irita keys add admin
 
 for i in {0..3}; do
    echo -e "${Mnemonics[$i]}\n${Password}\n${Password}" | ${ChainCMD} keys add "${Validators[$i]}" --recover --home "${NodeDic[$i]}";
@@ -54,7 +60,7 @@ for i in {0..3}; do
    $ChainCMD genkey --type node --out-file "${NodeDic[$i]}/priv_node.pem" --home="${NodeDic[$i]}";
 done
 
-# Change genesis.json and config.toml
+# Change genesis.json (https://hub.cosmos.network/main/resources/genesis.html) and config.toml
 sed -i 's/127.0.0.1:26657/0.0.0.0:26657/g' $Home/config/config.toml
 sed -i 's/addr_book_strict = true/addr_book_strict = false/' $Home/config/config.toml
 sed -i 's/timeout_commit = "5s"/timeout_commit = "2s"/' $Home/config/config.toml
