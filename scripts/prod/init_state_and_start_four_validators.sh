@@ -15,9 +15,10 @@ Mnemonics=("eagle marriage host height topple sorry exist nation screen affair b
 "setup capital exact dad minimum pigeon blush claw cake find animal torch cry guide dirt settle parade host grief lunar indicate laptop bulk cherry"
 )
 Validators=("validator0" "validator1" "validator2" "validator3")
+IpPorts=(tcp://127.0.0.1:26657 tcp://127.0.0.1:36657 tcp://127.0.0.1:46657 tcp://127.0.0.1:56657)
 Stake=uirita
 TotalStake=10000000000000000${Stake} # total stake in genesis
-# SendStake=10000000000000${Stake}
+SendStake=10000000000000${Stake}
 
 Point=upoint
 PointOwner=iaa1g6gqr3s58dhw3jq5hm95qrng0sa9um7gavevjc # replace with actual address, this is admin address
@@ -74,7 +75,7 @@ sed -i "s/\"base_denom\": \"$Stake\"/\"base_denom\": \"$Point\"/g" $Home/config/
 sed -i "s/\"restricted_service_fee_denom\": false/\"restricted_service_fee_denom\": true/g" $Home/config/genesis.json
 cat $Home/config/genesis.json | jq ".app_state.service.params.min_deposit[0].denom = \"$Point\"" > $Home/temp; cat $Home/temp; cp -f $Home/temp $Home/config/genesis.json
 cat $Home/config/genesis.json | jq ".app_state.token.tokens |= . + [$PointToken]" > $Home/temp; cat $Home/temp; cp -f $Home/temp $Home/config/genesis.json
-sed -i "s/\"base_token_manager\": \"\"/\"base_token_manager\": \"$(echo 12345678 | $ChainCMD keys show validator0 | grep address | cut -b 12-)\"/" $Home/config/genesis.json
+sed -i "s/\"base_token_manager\": \"\"/\"base_token_manager\": \"$(echo "${Password}" | $ChainCMD keys show validator0 | grep address | cut -b 12-)\"/" $Home/config/genesis.json
 sed -i "s/\"token_tax_rate\": \"0.400000000000000000\"/\"token_tax_rate\": \"1\"/g" $Home/config/genesis.json
 sed -i "s/\"denom\": \"irita\"/\"denom\": \"point\"/g" $Home/config/genesis.json
 sed -i "s/\"amount\": \"60000000000\"/\"amount\": \"60000\"/g" $Home/config/genesis.json
@@ -143,4 +144,32 @@ for i in {1..3}; do
     sed -i "s/pprof_laddr = \"localhost:6060\"/pprof_laddr = \"localhost:${port_prefix}6060\"/" ${NodeDic[$i]}/config/config.toml
     sed -i "s/laddr = \"tcp:\/\/0.0.0.0:26656\"/pprof_laddr = \"tcp:\/\/0.0.0.0:${port_prefix}6656\"/" ${NodeDic[$i]}/config/config.toml
     sed -i "s/prometheus_listen_addr = \":26660\"/prometheus_listen_addr = \":${port_prefix}6660\"/" ${NodeDic[$i]}/config/config.toml
+done
+
+# start node 0
+# cosmos sdk no logger https://github.com/cosmos/cosmos-sdk/issues/5050
+irita start  --pruning=nothing --home=${NodeDic[0]} > ${NodeDic[0]}/node.log  2>&1 &
+
+# Join validators from node 1 - 3
+for i in {1..3}; do
+   echo -e "processing join validator name is ${Validators[$i]}\n"
+   address=$(bash -c "echo ${Password} | ${ChainCMD} keys show ${Validators[$i]} --home=${NodeDic[0]}| grep address" | awk '{print $2}');
+   echo -e "validator addr is ${address}\n"
+   bash -c "echo -e \"${Password}\n${Password}\" | ${ChainCMD} tx bank send validator0 \$(echo $address  | sed 's/\\^M\\$//') ${SendStake} --chain-id $ChainID -y --home=${NodeDic[0]}";
+   sleep 2
+   bash -c "${ChainCMD} q bank balances \$(echo $address | sed 's/\\^M\\$//') --chain-id $ChainID --home=${NodeDic[0]}";
+   bash -c "echo -e \"${Password}\n${Password}\" | ${ChainCMD} tx perm assign-roles --from validator0 \$(echo $address | sed 's/\\^M\\$//') NODE_ADMIN --chain-id $ChainID -y --home=${NodeDic[0]}";
+   sleep 2
+   bash -c "${ChainCMD} q perm roles \$(echo $address  | sed 's/\\^M\\$//') --chain-id $ChainID --home=${NodeDic[0]}";
+   bash -c "echo -e \"${Password}\n${Password}\" | ${ChainCMD} tx node grant --name \"${NodeNames[$i]}\" --cert ${NodeDic[$i]}/node.crt --from validator0 --chain-id $ChainID -b block -y --home=${NodeDic[0]}";
+   sleep 2
+   bash -c "echo ${Password} | ${ChainCMD} keys show ${Validators[$i]} --home=${NodeDic[0]}"
+   bash -c "echo -e \"${Password}\n${Password}\" | ${ChainCMD} tx node create-validator --name \"${NodeNames[$i]}\" --from validator0 --cert ${NodeDic[$i]}/validator.crt --power 100 --chain-id $ChainID --node=${IpPorts[0]} -y --home=${NodeDic[0]}";
+   sleep 2
+done
+
+# start node 1 - 3
+for i in {1..3}; do
+   port_prefix=$(($i + 2))
+   irita start  --pruning=nothing --home=${NodeDic[$i]} --rpc.laddr="tcp://0.0.0.0:${port_prefix}6657" --p2p.laddr="tcp://0.0.0.0:${port_prefix}6656" > ${NodeDic[$i]}/node.log 2>&1 &
 done
