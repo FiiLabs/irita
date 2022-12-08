@@ -18,7 +18,8 @@ DataPath=/tmp
 
 Point=upoint
 PointOwner=iaa1g6gqr3s58dhw3jq5hm95qrng0sa9um7gavevjc # replace with actual address
-PointToken=`echo {\"symbol\": \"point\", \"name\": \"Irita point native token\", \"scale\": 6, \"min_unit\": \"upoint\", \"initial_supply\": \"1000000000\", \"max_supply\": \"1000000000000\", \"mintable\": true, \"owner\": \"${PointOwner}\"}`
+PointToken=`echo {\"symbol\": \"point\", \"name\": \"Irita point native token\", \"scale\": 6, \"min_unit\": \"upoint\", \"initial_supply\": \"1000000000\", \"max_supply\": \"1000000000000\", \"mintable\": true, \"owner\": \"${PointOwner}\"},{\"symbol\": \"gas\", \"name\": \"IRITA Fee Token\", \"scale\": 18, \"min_unit\": \"ugas\", \"initial_supply\": \"1000000000\", \"max_supply\": \"10000000000000000\", \"mintable\": true, \"owner\": \"${PointOwner}\"}`
+AddedToken=`echo {\"denom\": \"ugas\",\"amount\": \"5000000000000000000000\"},{\"denom\": \"uirita\",\"amount\": \"10000000000000000\"},{\"denom\": \"upoint\",\"amount\": \"5000000000\"}`
 
 $ChainCMD keys delete admin -y
 $ChainCMD keys delete validator0 -y
@@ -33,7 +34,15 @@ $ChainCMD genkey --type node --out-file $Home/priv_node.pem --home=$Home
 
 sed -i 's/127.0.0.1:26657/0.0.0.0:26657/g' $Home/config/config.toml
 
+sed -i 's/addr_book_strict = true/addr_book_strict = false/' $Home/config/config.toml
+
 sed -i 's/timeout_commit = "5s"/timeout_commit = "2s"/' $Home/config/config.toml
+
+sed -i 's/allow_duplicate_ip = false/allow_duplicate_ip = true/' $Home/config/config.toml
+
+sed -i 's/minimum-gas-prices = ""/minimum-gas-prices = "1uirita"/' $Home/config/app.toml
+
+#sed -i 's/filter_peers = false/filter_peers = true/' $Home/config/config.toml
 
 sed -i "s/stake/$Stake/g" $Home/config/genesis.json
 
@@ -65,11 +74,15 @@ sed -i "s/\"amount\": \"1000\"/\"amount\": \"1000000000\"/g" $Home/config/genesi
 
 sed -i "s/\"amount\": \"5000\"/\"amount\": \"5000000000\"/g" $Home/config/genesis.json
 
+
+
 sed -i "s/nodes\": \[/nodes\": \[{\"id\": \"$($ChainCMD tendermint show-node-id --home=$Home)\", \"name\": \"$NodeName\"}/" $Home/config/genesis.json
 
 bash -c "$ChainCMD add-genesis-account \$(echo 12345678 | $ChainCMD keys show validator0 -a --home=$Home) ${TotalStake} --root-admin --home=$Home"
 
 bash -c "$ChainCMD add-genesis-account ${PointOwner} 1000000000000000${Point} --home=$Home"
+
+cat $Home/config/genesis.json | jq ".app_state.bank.balances[0].coins = [$AddedToken]" > $Home/temp; cat $Home/temp; cp -f $Home/temp $Home/config/genesis.json
 
 openssl ecparam -genkey -name SM2 -out $Home/root.key
 
