@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"bufio"
 	"io"
 	"os"
 	"path/filepath"
@@ -63,10 +62,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		WithInterfaceRegistry(encodingConfig.InterfaceRegistry).
 		WithTxConfig(encodingConfig.TxConfig).
 		WithLegacyAmino(encodingConfig.Amino).
-		// fix https://github.com/cosmos/cosmos-sdk/issues/9566#issuecomment-889281861
-		// https://github.com/cosmos/cosmos-sdk/issues/9566
-		// https://github.com/FiiLabs/cosmos-sdk/blob/5884b3c7629f956160b1ff127c61ca241c6df759/client/keys/add.go#L84-L92
-		WithInput(bufio.NewReader(os.Stdin)).
+		WithInput(os.Stdin).
 		WithAccountRetriever(types.AccountRetriever{}).
 		WithBroadcastMode(flags.BroadcastBlock).
 		WithHomeDir(app.DefaultNodeHome).
