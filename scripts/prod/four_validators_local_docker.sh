@@ -29,22 +29,22 @@ KeyRingBackEndType="os"
 
 echo "Homeuser Path is ${HomeUserPath}"
 
-sudo rm -rf "$Home"
-sudo rm -rf "${HomeUserPath}/.irita"
-sudo rm -rf "root/.irita"
+rm -rf "$Home"
+rm -rf "${HomeUserPath}/.irita"
+sudo rm -rf "/root/.irita"
 
 $ChainCMD config keyring-backend $KeyRingBackEndType
 
-$ChainCMD keys delete admin -y
+echo -e "${Password}" | $ChainCMD keys delete admin -y --home "$Home"
 # delete all validators related keys and docker container names
 for i in {0..3}; do  
-   $ChainCMD keys delete "${Validators[$i]}" -y --home "${NodeDic[$i]}";
+   echo -e "${Password}" | $ChainCMD keys delete "${Validators[$i]}" -y --home "${NodeDic[$i]}";
    docker container rm "${NodeNames[$i]}";
 done
 
 # Add related accounts
 echo "please input Mnemonics: ${Mnemonics[4]}"
-${ChainCMD} keys add admin --recover
+${ChainCMD} keys add admin --recover --home "$Home"
 # (echo "setup capital exact dad minimum pigeon blush claw cake find animal torch cry guide dirt settle parade host grief lunar indicate laptop bulk cherry"; echo "12345678", echo "12345678") | sudo -E irita keys add admin --recover
 # (echo "12345678"; echo "12345678") | sudo -E irita keys add admin
 
@@ -163,25 +163,30 @@ done
 # gRPC web port 9091
 # JSON-RPC server port 8545 / JSON-RPC ws port 8546
 # irita start  --pruning=nothing --home=${NodeDic[0]} > ${NodeDic[0]}/node.log  2>&1 &
-docker run -d -p26657:26657 -p26656:26656 --mount type=bind,source=$PWD/testnet,target=/home --name ${NodeNames[0]} bianjieai/irita irita start --pruning=nothing --home=/home/${NodeNames[0]}
+docker run -d -p26657:26657 -p26656:26656 --mount type=bind,source=$PWD/testnet,target=/home --mount type=bind,source=$HomeUserPath/.irita,target=/root/.irita --name ${NodeNames[0]} bianjieai/irita irita start --pruning=nothing --home=/home/${NodeNames[0]}
 echo "container node0 started"
 sleep 10
 
 # Join validators from node 1 - 3
+sequence=0
 for i in {1..3}; do
    echo -e "processing join validator name is ${Validators[$i]}\n"
    address=$(bash -c "echo ${Password} | ${ChainCMD} keys show ${Validators[$i]} --home=${NodeDic[0]}| grep address" | awk '{print $2}');
    echo -e "validator addr is ${address}\n"
-   bash -c "echo -e \"${Password}\n${Password}\" | ${ChainCMD} tx bank send validator0 \$(echo $address  | sed 's/\\^M\\$//') ${SendStake} --chain-id $ChainID -y --home=${NodeDic[0]}";
+   bash -c "echo -e \"${Password}\n${Password}\" | ${ChainCMD} tx bank send validator0 \$(echo $address  | sed 's/\\^M\\$//') ${SendStake} --chain-id $ChainID -y --home=${NodeDic[0]} -s ${sequence}";
+   sequence=$((sequence+1))
    sleep 2
    bash -c "${ChainCMD} q bank balances \$(echo $address | sed 's/\\^M\\$//') --chain-id $ChainID --home=${NodeDic[0]}";
-   bash -c "echo -e \"${Password}\n${Password}\" | ${ChainCMD} tx perm assign-roles --from validator0 \$(echo $address | sed 's/\\^M\\$//') NODE_ADMIN --chain-id $ChainID -y --home=${NodeDic[0]}";
+   bash -c "echo -e \"${Password}\n${Password}\" | ${ChainCMD} tx perm assign-roles --from validator0 \$(echo $address | sed 's/\\^M\\$//') NODE_ADMIN --chain-id $ChainID -y --home=${NodeDic[0]} -s ${sequence}";
+   sequence=$((sequence+1))
    sleep 2
    bash -c "${ChainCMD} q perm roles \$(echo $address  | sed 's/\\^M\\$//') --chain-id $ChainID --home=${NodeDic[0]}";
-   bash -c "echo -e \"${Password}\n${Password}\" | ${ChainCMD} tx node grant --name \"${NodeNames[$i]}\" --cert ${NodeDic[$i]}/node.crt --from validator0 --chain-id $ChainID -b block -y --home=${NodeDic[0]}";
+   bash -c "echo -e \"${Password}\n${Password}\" | ${ChainCMD} tx node grant --name \"${NodeNames[$i]}\" --cert ${NodeDic[$i]}/node.crt --from validator0 --chain-id $ChainID -b block -y --home=${NodeDic[0]} -s ${sequence}";
+   sequence=$((sequence+1))
    sleep 2
    bash -c "echo ${Password} | ${ChainCMD} keys show ${Validators[$i]} --home=${NodeDic[0]}"
-   bash -c "echo -e \"${Password}\n${Password}\" | ${ChainCMD} tx node create-validator --name \"${NodeNames[$i]}\" --from validator0 --cert ${NodeDic[$i]}/validator.crt --power 100 --chain-id $ChainID --node=${IpPorts[0]} -y --home=${NodeDic[0]}";
+   bash -c "echo -e \"${Password}\n${Password}\" | ${ChainCMD} tx node create-validator --name \"${NodeNames[$i]}\" --from validator0 --cert ${NodeDic[$i]}/validator.crt --power 100 --chain-id $ChainID --node=${IpPorts[0]} -y --home=${NodeDic[0]} -s ${sequence}";
+   sequence=$((sequence+1))
    sleep 2
 done
 
@@ -224,7 +229,7 @@ done
 for i in {1..3}; do
    port_prefix=$(($i + 2))
    #irita start  --pruning=nothing --home=${NodeDic[$i]} --rpc.laddr="tcp://0.0.0.0:${port_prefix}6657" --p2p.laddr="tcp://0.0.0.0:${port_prefix}6656" > ${NodeDic[$i]}/node.log 2>&1 &
-   docker run -d -p${port_prefix}6657:26657 -p${port_prefix}6656:26656 --mount type=bind,source=$PWD/testnet,target=/home --name ${NodeNames[$i]} bianjieai/irita irita start --pruning=nothing --home=/home/${NodeNames[$i]} --rpc.laddr=tcp://0.0.0.0:26657 --p2p.laddr=tcp://0.0.0.0:26656
+   docker run -d -p${port_prefix}6657:26657 -p${port_prefix}6656:26656 --mount type=bind,source=$PWD/testnet,target=/home --mount type=bind,source=$HomeUserPath/.irita,target=/root/.irita --name ${NodeNames[$i]} bianjieai/irita irita start --pruning=nothing --home=/home/${NodeNames[$i]} --rpc.laddr=tcp://0.0.0.0:26657 --p2p.laddr=tcp://0.0.0.0:26656
    echo "container ${NodeNames[$i]} started"
 done
 echo "All started Finished"
