@@ -221,5 +221,7 @@ done
 for i in {1..3}; do
    port_prefix=$(($i + 2))
    #irita start  --pruning=nothing --home=${NodeDic[$i]} --rpc.laddr="tcp://0.0.0.0:${port_prefix}6657" --p2p.laddr="tcp://0.0.0.0:${port_prefix}6656" > ${NodeDic[$i]}/node.log 2>&1 &
-   docker run -d -p${port_prefix}6657:26657 -p${port_prefix}6656:26656 --mount type=bind,source=$PWD/testnet,target=/home --name ${NodeNames[0]} bianjieai/irita irita start --pruning=nothing --home=/home/${NodeNames[$i]} --rpc.laddr=tcp://0.0.0.0:26657 --p2p.laddr=tcp://0.0.0.0:26656
+   docker run -d -p${port_prefix}6657:26657 -p${port_prefix}6656:26656 --mount type=bind,source=$PWD/testnet,target=/home --name ${NodeNames[$i]} bianjieai/irita irita start --pruning=nothing --home=/home/${NodeNames[$i]} --rpc.laddr=tcp://0.0.0.0:26657 --p2p.laddr=tcp://0.0.0.0:26656
+   echo "container ${NodeNames[$i]} started"
 done
+echo "All started Finished"
