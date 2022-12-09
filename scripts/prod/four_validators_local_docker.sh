@@ -148,7 +148,18 @@ done
 
 # start node 0
 # cosmos sdk no logger https://github.com/cosmos/cosmos-sdk/issues/5050
-irita start  --pruning=nothing --home=${NodeDic[0]} > ${NodeDic[0]}/node.log  2>&1 &
+# node0 endPoints
+# Tendermint config
+# gRPC server port 26657
+# pprof server port 6060
+# p2p port 26656
+#-----------------------------------------
+# cosmos sdk config
+# REST API server port 1317
+# gRPC server port 9090
+# gRPC web port 9091
+# JSON-RPC server port 8545 / JSON-RPC ws port 8546
+# irita start  --pruning=nothing --home=${NodeDic[0]} > ${NodeDic[0]}/node.log  2>&1 &
 
 # Join validators from node 1 - 3
 for i in {1..3}; do
@@ -168,6 +179,41 @@ for i in {1..3}; do
    sleep 2
 done
 
+# node1 endPoints
+# Tendermint config
+# gRPC server port 36657
+# pprof server port 36060
+# p2p port 36656
+#-----------------------------------------
+# cosmos sdk config
+# REST API server port 31317
+# gRPC server port 39090
+# gRPC web port 39091
+# JSON-RPC server port 38545 / JSON-RPC ws port 38546
+
+# node2 endPoints
+# Tendermint config
+# gRPC server port 46657
+# pprof server port 46060
+# p2p port 46656
+#-----------------------------------------
+# cosmos sdk config
+# REST API server port 41317
+# gRPC server port 49090
+# gRPC web port 49091
+# JSON-RPC server port 48545 / JSON-RPC ws port 48546
+
+# node3 endPoints
+# Tendermint config
+# gRPC server port 56657
+# pprof server port 56060
+# p2p port 56656
+#-----------------------------------------
+# cosmos sdk config
+# REST API server port 51317
+# gRPC server port 59090
+# gRPC web port 59091
+# JSON-RPC server port 58545 / JSON-RPC ws port 58546
 # start node 1 - 3
 for i in {1..3}; do
    port_prefix=$(($i + 2))
