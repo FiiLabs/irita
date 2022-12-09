@@ -35,7 +35,7 @@ sudo rm -rf "root/.irita"
 
 $ChainCMD config keyring-backend $KeyRingBackEndType
 
-echo -e "${Password}" $ChainCMD keys delete admin -y
+echo -e "${Password}" $ChainCMD keys delete admin -y --home "$Home"
 # delete all validators related keys
 for i in {0..3}; do  
    echo -e "${Password}" | $ChainCMD keys delete "${Validators[$i]}" -y --home "${NodeDic[$i]}"
@@ -44,7 +44,7 @@ done
 # Add related accounts
 # (echo "${Mnemonics[4]}"; echo "${Password}") | ${ChainCMD} keys add admin --recover
 echo "please input Mnemonics: ${Mnemonics[4]}"
-${ChainCMD} keys add admin --recover
+${ChainCMD} keys add admin --recover --home "$Home"
 # (echo "setup capital exact dad minimum pigeon blush claw cake find animal torch cry guide dirt settle parade host grief lunar indicate laptop bulk cherry"; echo "12345678", echo "12345678") | sudo -E irita keys add admin --recover
 # (echo "12345678"; echo "12345678") | sudo -E irita keys add admin
 
@@ -55,14 +55,14 @@ for i in {0..3}; do
 done
 
 # for generating a temaplate genesis.json for change it and copy
-$ChainCMD init moniker --chain-id $ChainID --home=$Home
+$ChainCMD init moniker --chain-id $ChainID --home $Home
 
 for i in {0..3}; do
-   $ChainCMD init moniker --chain-id $ChainID --home="${NodeDic[$i]}";
+   $ChainCMD init moniker --chain-id $ChainID --home "${NodeDic[$i]}";
    # validator key
-   $ChainCMD genkey --out-file "${NodeDic[$i]}/priv_validator.pem" --home="${NodeDic[$i]}";
+   $ChainCMD genkey --out-file "${NodeDic[$i]}/priv_validator.pem" --home "${NodeDic[$i]}";
    # node key
-   $ChainCMD genkey --type node --out-file "${NodeDic[$i]}/priv_node.pem" --home="${NodeDic[$i]}";
+   $ChainCMD genkey --type node --out-file "${NodeDic[$i]}/priv_node.pem" --home "${NodeDic[$i]}";
 done
 
 # Change genesis.json (https://hub.cosmos.network/main/resources/genesis.html) and config.toml
@@ -87,18 +87,18 @@ sed -i "s/\"amount\": \"1000000000\"/\"amount\": \"1000000000000000\"/g" $Home/c
 sed -i "s/\"amount\": \"500000000\"/\"amount\": \"1000000000000000\"/g" $Home/config/genesis.json
 sed -i "s/\"amount\": \"1000\"/\"amount\": \"1000000000\"/g" $Home/config/genesis.json
 sed -i "s/\"amount\": \"5000\"/\"amount\": \"5000000000\"/g" $Home/config/genesis.json
-sed -i "s/nodes\": \[/nodes\": \[{\"id\": \"$($ChainCMD tendermint show-node-id --home=$Home)\", \"name\": \"$NodeName\"}/" $Home/config/genesis.json
+sed -i "s/nodes\": \[/nodes\": \[{\"id\": \"$($ChainCMD tendermint show-node-id --home $Home)\", \"name\": \"$NodeName\"}/" $Home/config/genesis.json
 
-validator0_address=$($ChainCMD keys show validator0 -a --home="${NodeDic[0]}")
-$ChainCMD add-genesis-account "${validator0_address}" ${TotalStake} --root-admin --home=$Home
+validator0_address=$($ChainCMD keys show validator0 -a --home "${NodeDic[0]}")
+$ChainCMD add-genesis-account "${validator0_address}" ${TotalStake} --root-admin --home $Home
 PointOwner=$($ChainCMD keys show admin -a)
-$ChainCMD add-genesis-account "${PointOwner}" 1000000000000000${Point} --home=$Home
+$ChainCMD add-genesis-account "${PointOwner}" 1000000000000000${Point} --home $Home
 
 ## generate root.key and root.crt
 openssl ecparam -genkey -name SM2 -out $Home/root.key
 echo -e "CN\nSH\nSH\nIT\nDEV\n'${NodeNames[0]}'\n\n" | openssl req -new -x509 -sm3 -sigopt "distid:1234567812345678" -key $Home/root.key -out $Home/root.crt -days 3650
 # set root cert
-$ChainCMD set-root-cert $Home/root.crt --home=$Home
+$ChainCMD set-root-cert $Home/root.crt --home $Home
 
 for i in {0..3}; do
     # generate validator.crt
@@ -110,14 +110,14 @@ for i in {0..3}; do
 done
 
 # set node0 is genesis validator(first validator)
-echo ${Password} | $ChainCMD add-genesis-validator --name ${NodeNames[0]} --cert "${NodeDic[0]}/validator.crt" --power 10000 --from validator0 --home=$Home
+echo ${Password} | $ChainCMD add-genesis-validator --name ${NodeNames[0]} --cert "${NodeDic[0]}/validator.crt" --power 10000 --from validator0 --home $Home
 
 #sed -i "s/persistent_peers = \"\"/persistent_peers = \"$($ChainCMD tendermint show-node-id --home=${NodeDic[0]} | sed 's/\^M\$//')@`echo ${NodeIP[0]} | awk -F // '{print $2}'`:26656,$($ChainCMD tendermint show-node-id --home=${NodeDic[1]} | sed 's/\^M\$//')@`echo ${NodeIP[0]} | awk -F // '{print $2}'`:36656,$($ChainCMD tendermint show-node-id --home=${NodeDic[2]} | sed 's/\^M\$//')@`echo ${NodeIP[0]} | awk -F // '{print $2}'`:46656,$($ChainCMD tendermint show-node-id --home=${NodeDic[3]} | sed 's/\^M\$//')@`echo ${NodeIP[0]} | awk -F // '{print $2}'`:56656\"/" $Home/config/config.toml
-sed -i "s/persistent_peers = \"\"/persistent_peers = \"$($ChainCMD tendermint show-node-id --home="${NodeDic[0]}" | sed 's/\^M\$//')@`echo "${NodeIP[0]}" | awk -F // '{print $2}'`:26656\"/" $Home/config/config.toml
+sed -i "s/persistent_peers = \"\"/persistent_peers = \"$($ChainCMD tendermint show-node-id --home "${NodeDic[0]}" | sed 's/\^M\$//')@`echo "${NodeIP[0]}" | awk -F // '{print $2}'`:26656\"/" $Home/config/config.toml
 
 for i in {0..3}; do
    echo "node ${NodeDic[0]} id is";
-   $ChainCMD tendermint show-node-id --home="${NodeDic[0]}" | sed 's/\^M\$//';
+   $ChainCMD tendermint show-node-id --home "${NodeDic[0]}" | sed 's/\^M\$//';
 done
 
 # Copy config files unerder folder config to other nodes
@@ -152,7 +152,7 @@ done
 
 # start node 0
 # cosmos sdk no logger https://github.com/cosmos/cosmos-sdk/issues/5050
-irita start  --pruning=nothing --home=${NodeDic[0]} > ${NodeDic[0]}/node.log  2>&1 &
+irita start  --pruning=nothing --home ${NodeDic[0]} > ${NodeDic[0]}/node.log  2>&1 &
 echo "container node0 started"
 sleep 10
 
