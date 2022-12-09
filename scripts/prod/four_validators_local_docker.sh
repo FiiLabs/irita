@@ -36,9 +36,10 @@ sudo rm -rf "root/.irita"
 $ChainCMD config keyring-backend $KeyRingBackEndType
 
 $ChainCMD keys delete admin -y
-# delete all validators related keys
+# delete all validators related keys and docker container names
 for i in {0..3}; do  
-   $ChainCMD keys delete "${Validators[$i]}" -y --home "${NodeDic[$i]}"
+   $ChainCMD keys delete "${Validators[$i]}" -y --home "${NodeDic[$i]}";
+   docker container rm "${NodeNames[$i]}";
 done
 
 # Add related accounts
@@ -161,6 +162,7 @@ done
 # JSON-RPC server port 8545 / JSON-RPC ws port 8546
 # irita start  --pruning=nothing --home=${NodeDic[0]} > ${NodeDic[0]}/node.log  2>&1 &
 docker run -d -p26657:26657 -p26656:26656 --mount type=bind,source=$PWD/testnet,target=/home --name ${NodeNames[0]} bianjieai/irita irita start --pruning=nothing --home=/home/${NodeNames[0]}
+echo "container node0 started"
 
 # Join validators from node 1 - 3
 for i in {1..3}; do
