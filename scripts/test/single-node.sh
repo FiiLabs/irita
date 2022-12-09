@@ -1,7 +1,7 @@
-#!/bin/sh
+#!/usr/bin/env bash
 Home=./testnet
 ChainID=testnet # chain-id
-ChainCMD=./build/irita
+ChainCMD=irita
 NodeName=irita-node # node name
 NodeIP=(tcp://127.0.0.1 tcp://127.0.0.1 tcp://127.0.0.1 tcp://127.0.0.1)
 NodeNames=("node0" "node1" "node2" "node3")
@@ -13,18 +13,34 @@ Mnemonics=("eagle marriage host height topple sorry exist nation screen affair b
 )
 Stake=uirita
 TotalStake=10000000000000000${Stake} # total stake in genesis
-SendStake=10000000000000${Stake}
-DataPath=/tmp
+# SendStake=10000000000000${Stake}
+# DataPath=/tmp
 
 Point=upoint
 PointOwner=iaa1g6gqr3s58dhw3jq5hm95qrng0sa9um7gavevjc # replace with actual address
+# PointToken=$(echo \{\"symbol\": \"point\", \"name\": \"Irita point native token\", \"scale\": 6, \"min_unit\": \"upoint\", \"initial_supply\": \"1000000000\", \"max_supply\": \"1000000000000\", \"mintable\": true, \"owner\": \"${PointOwner}\"\})
+
+rm -rf "$Home"
+# rm -rf /home/mathxh/.irita
+
 PointToken=`echo {\"symbol\": \"point\", \"name\": \"Irita point native token\", \"scale\": 6, \"min_unit\": \"upoint\", \"initial_supply\": \"1000000000\", \"max_supply\": \"1000000000000\", \"mintable\": true, \"owner\": \"${PointOwner}\"},{\"symbol\": \"gas\", \"name\": \"IRITA Fee Token\", \"scale\": 18, \"min_unit\": \"ugas\", \"initial_supply\": \"1000000000\", \"max_supply\": \"10000000000000000\", \"mintable\": true, \"owner\": \"${PointOwner}\"}`
 AddedToken=`echo {\"denom\": \"ugas\",\"amount\": \"5000000000000000000000\"},{\"denom\": \"uirita\",\"amount\": \"10000000000000000\"},{\"denom\": \"upoint\",\"amount\": \"5000000000\"}`
 
 $ChainCMD keys delete admin -y
 $ChainCMD keys delete validator0 -y
-bash -c "echo -e \"${Mnemonics[4]}\n12345678\n12345678\" | ${ChainCMD} keys add admin --recover --home=$Home"
-bash -c "echo -e \"${Mnemonics[0]}\n12345678\n12345678\" | ${ChainCMD} keys add validator0 --recover --home=$Home"
+
+admin_secret_info="${Mnemonics[4]}
+12345678
+12345678
+"
+
+validator0_secret_info="${Mnemonics[0]}
+12345678
+12345678
+"
+
+$ChainCMD keys add admin --recover --home=$Home <<< "${admin_secret_info}"
+$ChainCMD keys add validator0 --recover --home=$Home <<< "${validator0_secret_info}"
 
 $ChainCMD init moniker --chain-id $ChainID --home=$Home
 

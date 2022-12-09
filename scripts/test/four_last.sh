@@ -1,7 +1,7 @@
-#!/bin/sh
+#!/usr/bin/env bash
 Home=./testnet
 ChainID=testnet # chain-id
-ChainCMD=./build/irita
+ChainCMD=irita
 NodeName=irita-node # node name
 NodeIP=(tcp://127.0.0.1 tcp://127.0.0.1 tcp://127.0.0.1 tcp://127.0.0.1)
 NodeNames=("node0" "node1" "node2" "node3")
@@ -24,8 +24,9 @@ PointOwner=iaa1g6gqr3s58dhw3jq5hm95qrng0sa9um7gavevjc # replace with actual addr
 PointToken=`echo {\"symbol\": \"point\", \"name\": \"Irita point native token\", \"scale\": 6, \"min_unit\": \"upoint\", \"initial_supply\": \"1000000000\", \"max_supply\": \"1000000000000\", \"mintable\": true, \"owner\": \"${PointOwner}\"}`
 
 for i in `seq 1 $[ ${#Validators[*]} -1 ]`; do
+echo -e "processing validator name is ${Validators[$i]}\n"
 address=$(bash -c "echo 12345678 | ${ChainCMD} keys show ${Validators[$i]} --home=${NodeDic[0]}| grep address" | awk '{print $2}');
-echo $address
+echo -e "validator addr is ${address}\n"
 bash -c "echo -e \"12345678\n12345678\" | ${ChainCMD} tx bank send validator0 \$(echo $address  | sed 's/\\^M\\$//') ${SendStake} --chain-id $ChainID -y --home=${NodeDic[0]}";
 sleep 2
 bash -c "${ChainCMD} q bank balances \$(echo $address | sed 's/\\^M\\$//') --chain-id $ChainID --home=${NodeDic[0]}";

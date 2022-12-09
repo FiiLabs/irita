@@ -8,9 +8,15 @@ import (
 
 	"github.com/bianjieai/irita/app"
 	"github.com/bianjieai/irita/cmd/irita/cmd"
+	//_ "net/http/pprof"
 )
 
 func main() {
+
+	// go func() {
+	// 	fmt.Println(http.ListenAndServe("localhost:6060", nil))
+	// }()
+
 	rootCmd, _ := cmd.NewRootCmd()
 	if err := svrcmd.Execute(rootCmd, app.DefaultNodeHome); err != nil {
 		switch e := err.(type) {
