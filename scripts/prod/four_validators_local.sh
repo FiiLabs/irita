@@ -38,7 +38,7 @@ $ChainCMD config keyring-backend $KeyRingBackEndType
 echo -e "${Password}" $ChainCMD keys delete admin -y --home "$Home"
 # delete all validators related keys
 for i in {0..3}; do  
-   echo -e "${Password}" | $ChainCMD keys delete "${Validators[$i]}" -y --home "${NodeDic[$i]}"
+   echo -e "${Password}" | $ChainCMD keys delete "${Validators[$i]}" -y --home "$Home"
 done
 
 # Add related accounts
@@ -157,20 +157,25 @@ echo "container node0 started"
 sleep 10
 
 # Join validators from node 1 - 3
+sequence=0
 for i in {1..3}; do
    echo -e "processing join validator name is ${Validators[$i]}\n"
    address=$(bash -c "echo ${Password} | ${ChainCMD} keys show ${Validators[$i]} --home=${NodeDic[0]}| grep address" | awk '{print $2}');
    echo -e "validator addr is ${address}\n"
-   bash -c "echo -e \"${Password}\n${Password}\" | ${ChainCMD} tx bank send validator0 \$(echo $address  | sed 's/\\^M\\$//') ${SendStake} --chain-id $ChainID -y --home=${NodeDic[0]}";
+   bash -c "echo -e \"${Password}\n${Password}\" | ${ChainCMD} tx bank send validator0 \$(echo $address  | sed 's/\\^M\\$//') ${SendStake} --chain-id $ChainID -y --home=${NodeDic[0]} -s ${sequence}";
+   sequence=$((sequence+1))
    sleep 2
    bash -c "${ChainCMD} q bank balances \$(echo $address | sed 's/\\^M\\$//') --chain-id $ChainID --home=${NodeDic[0]}";
-   bash -c "echo -e \"${Password}\n${Password}\" | ${ChainCMD} tx perm assign-roles --from validator0 \$(echo $address | sed 's/\\^M\\$//') NODE_ADMIN --chain-id $ChainID -y --home=${NodeDic[0]}";
+   bash -c "echo -e \"${Password}\n${Password}\" | ${ChainCMD} tx perm assign-roles --from validator0 \$(echo $address | sed 's/\\^M\\$//') NODE_ADMIN --chain-id $ChainID -y --home=${NodeDic[0]} -s ${sequence}";
+   sequence=$((sequence+1))
    sleep 2
    bash -c "${ChainCMD} q perm roles \$(echo $address  | sed 's/\\^M\\$//') --chain-id $ChainID --home=${NodeDic[0]}";
-   bash -c "echo -e \"${Password}\n${Password}\" | ${ChainCMD} tx node grant --name \"${NodeNames[$i]}\" --cert ${NodeDic[$i]}/node.crt --from validator0 --chain-id $ChainID -b block -y --home=${NodeDic[0]}";
+   bash -c "echo -e \"${Password}\n${Password}\" | ${ChainCMD} tx node grant --name \"${NodeNames[$i]}\" --cert ${NodeDic[$i]}/node.crt --from validator0 --chain-id $ChainID -b block -y --home=${NodeDic[0]} -s ${sequence}";
+   sequence=$((sequence+1))
    sleep 2
    bash -c "echo ${Password} | ${ChainCMD} keys show ${Validators[$i]} --home=${NodeDic[0]}"
-   bash -c "echo -e \"${Password}\n${Password}\" | ${ChainCMD} tx node create-validator --name \"${NodeNames[$i]}\" --from validator0 --cert ${NodeDic[$i]}/validator.crt --power 100 --chain-id $ChainID --node=${IpPorts[0]} -y --home=${NodeDic[0]}";
+   bash -c "echo -e \"${Password}\n${Password}\" | ${ChainCMD} tx node create-validator --name \"${NodeNames[$i]}\" --from validator0 --cert ${NodeDic[$i]}/validator.crt --power 100 --chain-id $ChainID --node=${IpPorts[0]} -y --home=${NodeDic[0]} -s ${sequence}";
+   sequence=$((sequence+1))
    sleep 2
 done
 
