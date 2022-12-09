@@ -25,7 +25,7 @@ PointOwner=iaa1g6gqr3s58dhw3jq5hm95qrng0sa9um7gavevjc # replace with actual addr
 PointToken="{\"symbol\": \"point\", \"name\": \"Irita point native token\", \"scale\": 6, \"min_unit\": \"upoint\", \"initial_supply\": \"1000000000\", \"max_supply\": \"1000000000000\", \"mintable\": true, \"owner\": \"${PointOwner}\"}"
 Password=12345678
 # https://docs.cosmos.network/v0.46/run-node/keyring.html
-KeyRingBackEndType="file"
+KeyRingBackEndType="os"
 
 echo "Homeuser Path is ${HomeUserPath}"
 
@@ -43,12 +43,14 @@ for i in {0..3}; do
 done
 
 # Add related accounts
-(echo "${Mnemonics[4]}"; echo "${Password}") | ${ChainCMD} keys add admin --recover
+echo "please input Mnemonics: ${Mnemonics[4]}"
+${ChainCMD} keys add admin --recover
 # (echo "setup capital exact dad minimum pigeon blush claw cake find animal torch cry guide dirt settle parade host grief lunar indicate laptop bulk cherry"; echo "12345678", echo "12345678") | sudo -E irita keys add admin --recover
 # (echo "12345678"; echo "12345678") | sudo -E irita keys add admin
 
 for i in {0..3}; do
-   echo -e "${Mnemonics[$i]}\n${Password}\n${Password}" | ${ChainCMD} keys add "${Validators[$i]}" --recover --home "${NodeDic[$i]}";
+   echo "please input Mnemonics: ${Mnemonics[$i]}";
+   ${ChainCMD} keys add "${Validators[$i]}" --recover --home "${NodeDic[$i]}";
 done
 
 # for generating a temaplate genesis.json for change it and copy
@@ -163,6 +165,7 @@ done
 # irita start  --pruning=nothing --home=${NodeDic[0]} > ${NodeDic[0]}/node.log  2>&1 &
 docker run -d -p26657:26657 -p26656:26656 --mount type=bind,source=$PWD/testnet,target=/home --name ${NodeNames[0]} bianjieai/irita irita start --pruning=nothing --home=/home/${NodeNames[0]}
 echo "container node0 started"
+sleep 10
 
 # Join validators from node 1 - 3
 for i in {1..3}; do
