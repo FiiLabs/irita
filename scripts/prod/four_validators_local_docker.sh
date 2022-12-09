@@ -25,7 +25,7 @@ PointOwner=iaa1g6gqr3s58dhw3jq5hm95qrng0sa9um7gavevjc # replace with actual addr
 PointToken="{\"symbol\": \"point\", \"name\": \"Irita point native token\", \"scale\": 6, \"min_unit\": \"upoint\", \"initial_supply\": \"1000000000\", \"max_supply\": \"1000000000000\", \"mintable\": true, \"owner\": \"${PointOwner}\"}"
 Password=12345678
 # https://docs.cosmos.network/v0.46/run-node/keyring.html
-KeyRingBackEndType="os"
+KeyRingBackEndType="file"
 
 echo "Homeuser Path is ${HomeUserPath}"
 

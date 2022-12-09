@@ -25,7 +25,7 @@ PointOwner=iaa1g6gqr3s58dhw3jq5hm95qrng0sa9um7gavevjc # replace with actual addr
 PointToken="{\"symbol\": \"point\", \"name\": \"Irita point native token\", \"scale\": 6, \"min_unit\": \"upoint\", \"initial_supply\": \"1000000000\", \"max_supply\": \"1000000000000\", \"mintable\": true, \"owner\": \"${PointOwner}\"}"
 Password=12345678
 # https://docs.cosmos.network/v0.46/run-node/keyring.html
-KeyRingBackEndType="os"
+KeyRingBackEndType="file"
 
 echo "Homeuser Path is ${HomeUserPath}"
 
@@ -38,16 +38,20 @@ $ChainCMD config keyring-backend $KeyRingBackEndType
 $ChainCMD keys delete admin -y
 # delete all validators related keys
 for i in {0..3}; do  
-   $ChainCMD keys delete "${Validators[$i]}" -y --home "${NodeDic[$i]}"
+   echo -e "${Password}" | $ChainCMD keys delete "${Validators[$i]}" -y --home "${NodeDic[$i]}"
 done
 
 # Add related accounts
-(echo "${Mnemonics[4]}"; echo "${Password}") | ${ChainCMD} keys add admin --recover
+# (echo "${Mnemonics[4]}"; echo "${Password}") | ${ChainCMD} keys add admin --recover
+echo "please input Mnemonics: ${Mnemonics[4]}"
+${ChainCMD} keys add admin --recover
 # (echo "setup capital exact dad minimum pigeon blush claw cake find animal torch cry guide dirt settle parade host grief lunar indicate laptop bulk cherry"; echo "12345678", echo "12345678") | sudo -E irita keys add admin --recover
 # (echo "12345678"; echo "12345678") | sudo -E irita keys add admin
 
 for i in {0..3}; do
-   echo -e "${Mnemonics[$i]}\n${Password}\n${Password}" | ${ChainCMD} keys add "${Validators[$i]}" --recover --home "${NodeDic[$i]}";
+   echo "please input Mnemonics: ${Mnemonics[$i]}";
+   # echo -e "${Mnemonics[$i]}\n${Password}\n${Password}" | ${ChainCMD} keys add "${Validators[$i]}" --recover --home "${NodeDic[$i]}";
+   ${ChainCMD} keys add "${Validators[$i]}" --recover --home "${NodeDic[$i]}";
 done
 
 # for generating a temaplate genesis.json for change it and copy
@@ -149,6 +153,8 @@ done
 # start node 0
 # cosmos sdk no logger https://github.com/cosmos/cosmos-sdk/issues/5050
 irita start  --pruning=nothing --home=${NodeDic[0]} > ${NodeDic[0]}/node.log  2>&1 &
+echo "container node0 started"
+sleep 10
 
 # Join validators from node 1 - 3
 for i in {1..3}; do
@@ -172,4 +178,6 @@ done
 for i in {1..3}; do
    port_prefix=$(($i + 2))
    irita start  --pruning=nothing --home=${NodeDic[$i]} --rpc.laddr="tcp://0.0.0.0:${port_prefix}6657" --p2p.laddr="tcp://0.0.0.0:${port_prefix}6656" > ${NodeDic[$i]}/node.log 2>&1 &
+   echo "${NodeNames[$i]} started"
 done
+echo "All started Finished"
