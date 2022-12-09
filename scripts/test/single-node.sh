@@ -21,7 +21,7 @@ PointOwner=iaa1g6gqr3s58dhw3jq5hm95qrng0sa9um7gavevjc # replace with actual addr
 # PointToken=$(echo \{\"symbol\": \"point\", \"name\": \"Irita point native token\", \"scale\": 6, \"min_unit\": \"upoint\", \"initial_supply\": \"1000000000\", \"max_supply\": \"1000000000000\", \"mintable\": true, \"owner\": \"${PointOwner}\"\})
 
 rm -rf "$Home"
-rm -rf /home/mathxh/.irita
+# rm -rf /home/mathxh/.irita
 
 PointToken=`echo {\"symbol\": \"point\", \"name\": \"Irita point native token\", \"scale\": 6, \"min_unit\": \"upoint\", \"initial_supply\": \"1000000000\", \"max_supply\": \"1000000000000\", \"mintable\": true, \"owner\": \"${PointOwner}\"},{\"symbol\": \"gas\", \"name\": \"IRITA Fee Token\", \"scale\": 18, \"min_unit\": \"ugas\", \"initial_supply\": \"1000000000\", \"max_supply\": \"10000000000000000\", \"mintable\": true, \"owner\": \"${PointOwner}\"}`
 AddedToken=`echo {\"denom\": \"ugas\",\"amount\": \"5000000000000000000000\"},{\"denom\": \"uirita\",\"amount\": \"10000000000000000\"},{\"denom\": \"upoint\",\"amount\": \"5000000000\"}`
