@@ -31,6 +31,7 @@ Password=12345678
 # https://docs.cosmos.network/v0.46/run-node/keyring.html
 KeyRingBackEndType="file"
 DockerFlag=$1
+DockerImageName="mathxh/fiilabs"
 
 
 rm -rf "$Home"
@@ -168,7 +169,7 @@ done
 # gRPC web port 9091
 # JSON-RPC server port 8545 / JSON-RPC ws port 8546
 if [ "$DockerFlag" == "docker" ]; then
-   docker run -d -p26657:26657 -p26656:26656 --mount type=bind,source=$PWD/testnet,target=/home --mount type=bind,source=$HomeUserPath/.irita,target=/root/.irita --name ${NodeNames[0]} bianjieai/irita irita start --pruning=nothing --home=/home/${NodeNames[0]}
+   docker run -d -p26657:26657 -p26656:26656 --mount type=bind,source=$PWD/testnet,target=/home --mount type=bind,source=$HomeUserPath/.irita,target=/root/.irita --name ${NodeNames[0]} ${DockerImageName} irita start --pruning=nothing --home=/home/${NodeNames[0]}
    echo "container node0 started"
 else
    # start node 0
@@ -240,7 +241,7 @@ done
 for i in {1..3}; do
    port_prefix=$(($i + 2))
    if [ "$DockerFlag" == "docker" ]; then
-      docker run -d -p${port_prefix}6657:26657 -p${port_prefix}6656:26656 --mount type=bind,source=$PWD/testnet,target=/home --mount type=bind,source=$HomeUserPath/.irita,target=/root/.irita --name ${NodeNames[$i]} bianjieai/irita irita start --pruning=nothing --home=/home/${NodeNames[$i]} --rpc.laddr=tcp://0.0.0.0:26657 --p2p.laddr=tcp://0.0.0.0:26656
+      docker run -d -p${port_prefix}6657:26657 -p${port_prefix}6656:26656 --mount type=bind,source=$PWD/testnet,target=/home --mount type=bind,source=$HomeUserPath/.irita,target=/root/.irita --name ${NodeNames[$i]} ${DockerImageName} irita start --pruning=nothing --home=/home/${NodeNames[$i]} --rpc.laddr=tcp://0.0.0.0:26657 --p2p.laddr=tcp://0.0.0.0:26656
       echo "container ${NodeNames[$i]} started"
    else
       irita start  --pruning=nothing --home=${NodeDic[$i]} --rpc.laddr="tcp://0.0.0.0:${port_prefix}6657" --p2p.laddr="tcp://0.0.0.0:${port_prefix}6656" > ${NodeDic[$i]}/node.log 2>&1 &
