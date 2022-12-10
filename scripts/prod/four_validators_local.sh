@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 
+# How to use this script: ./script/prod/four_validators_local.sh <docker | empty>
+# docker: run docker container
+# empty: run irita directly
+
 Home=./testnet
+HomeUserPath=$HOME
 ChainID=testnet # chain-id
 ChainCMD="irita"
 NodeName=irita-node # node name
@@ -25,19 +30,23 @@ PointToken="{\"symbol\": \"point\", \"name\": \"Irita point native token\", \"sc
 Password=12345678
 # https://docs.cosmos.network/v0.46/run-node/keyring.html
 KeyRingBackEndType="file"
+DockerFlag=$1
+
 
 rm -rf "$Home"
 
 $ChainCMD config keyring-backend $KeyRingBackEndType
 
 echo -e "${Password}" | $ChainCMD keys delete admin -y --home "$Home" --keyring-backend $KeyRingBackEndType
-# delete all validators related keys
+# delete all validators related keys and docker container names
 for i in {0..3}; do  
-   echo -e "${Password}" | $ChainCMD keys delete "${Validators[$i]}" -y --home "$Home"  --keyring-backend $KeyRingBackEndType
+   echo -e "${Password}" | $ChainCMD keys delete "${Validators[$i]}" -y --home "${NodeDic[$i]}" --keyring-backend $KeyRingBackEndType;
+   if [ "$DockerFlag" == "docker" ]; then
+      docker container rm "${NodeNames[$i]}";
+   fi
 done
 
 # Add related accounts
-# (echo "${Mnemonics[4]}"; echo "${Password}") | ${ChainCMD} keys add admin --recover
 echo "please input Mnemonics: ${Mnemonics[4]}"
 ${ChainCMD} keys add admin --recover --home "$Home" --keyring-backend $KeyRingBackEndType
 # (echo "setup capital exact dad minimum pigeon blush claw cake find animal torch cry guide dirt settle parade host grief lunar indicate laptop bulk cherry"; echo "12345678", echo "12345678") | sudo -E irita keys add admin --recover
@@ -45,22 +54,19 @@ ${ChainCMD} keys add admin --recover --home "$Home" --keyring-backend $KeyRingBa
 
 for i in {0..3}; do
    echo "please input Mnemonics: ${Mnemonics[$i]}";
-   # echo -e "${Mnemonics[$i]}\n${Password}\n${Password}" | ${ChainCMD} keys add "${Validators[$i]}" --recover --home "${NodeDic[$i]}";
    ${ChainCMD} keys add "${Validators[$i]}" --recover --home "${NodeDic[$i]}" --keyring-backend $KeyRingBackEndType;
 done
 
 # for generating a temaplate genesis.json for change it and copy
-$ChainCMD init moniker --chain-id $ChainID --home $Home
+$ChainCMD init moniker --chain-id $ChainID --home=$Home
 
 for i in {0..3}; do
-   $ChainCMD init moniker --chain-id $ChainID --home "${NodeDic[$i]}";
+   $ChainCMD init moniker --chain-id $ChainID --home="${NodeDic[$i]}";
    # validator key
-   $ChainCMD genkey --out-file "${NodeDic[$i]}/priv_validator.pem" --home "${NodeDic[$i]}";
+   $ChainCMD genkey --out-file "${NodeDic[$i]}/priv_validator.pem" --home="${NodeDic[$i]}";
    # node key
-   $ChainCMD genkey --type node --out-file "${NodeDic[$i]}/priv_node.pem" --home "${NodeDic[$i]}";
+   $ChainCMD genkey --type node --out-file "${NodeDic[$i]}/priv_node.pem" --home="${NodeDic[$i]}";
 done
-
-echo "################################ genkey  "
 
 # Change genesis.json (https://hub.cosmos.network/main/resources/genesis.html) and config.toml
 sed -i 's/127.0.0.1:26657/0.0.0.0:26657/g' $Home/config/config.toml
@@ -76,10 +82,8 @@ sed -i "s/\"base_denom\": \"$Stake\"/\"base_denom\": \"$Point\"/g" $Home/config/
 sed -i "s/\"restricted_service_fee_denom\": false/\"restricted_service_fee_denom\": true/g" $Home/config/genesis.json
 cat $Home/config/genesis.json | jq ".app_state.service.params.min_deposit[0].denom = \"$Point\"" > $Home/temp; cat $Home/temp; cp -f $Home/temp $Home/config/genesis.json
 cat $Home/config/genesis.json | jq ".app_state.token.tokens |= . + [$PointToken]" > $Home/temp; cat $Home/temp; cp -f $Home/temp $Home/config/genesis.json
-echo "################################### validator0 address"
 validator0_address=$($ChainCMD keys show validator0 -a --keyring-backend $KeyRingBackEndType)
 sed -i "s/\"base_token_manager\": \"\"/\"base_token_manager\": \"${validator0_address}\"/" $Home/config/genesis.json
-echo "################################### validator0 address ended"
 sed -i "s/\"token_tax_rate\": \"0.400000000000000000\"/\"token_tax_rate\": \"1\"/g" $Home/config/genesis.json
 sed -i "s/\"denom\": \"irita\"/\"denom\": \"point\"/g" $Home/config/genesis.json
 sed -i "s/\"amount\": \"60000000000\"/\"amount\": \"60000\"/g" $Home/config/genesis.json
@@ -87,24 +91,18 @@ sed -i "s/\"amount\": \"1000000000\"/\"amount\": \"1000000000000000\"/g" $Home/c
 sed -i "s/\"amount\": \"500000000\"/\"amount\": \"1000000000000000\"/g" $Home/config/genesis.json
 sed -i "s/\"amount\": \"1000\"/\"amount\": \"1000000000\"/g" $Home/config/genesis.json
 sed -i "s/\"amount\": \"5000\"/\"amount\": \"5000000000\"/g" $Home/config/genesis.json
-sed -i "s/nodes\": \[/nodes\": \[{\"id\": \"$($ChainCMD tendermint show-node-id --home $Home)\", \"name\": \"$NodeName\"}/" $Home/config/genesis.json
+sed -i "s/nodes\": \[/nodes\": \[{\"id\": \"$($ChainCMD tendermint show-node-id --home=$Home)\", \"name\": \"$NodeName\"}/" $Home/config/genesis.json
 
-validator0_address=$($ChainCMD keys show validator0 -a --home "${NodeDic[0]}" --keyring-backend $KeyRingBackEndType)
-echo "################################### validator0 address 2"
-$ChainCMD add-genesis-account "${validator0_address}" ${TotalStake} --root-admin --home $Home --keyring-backend $KeyRingBackEndType
-echo "################################### added genesis account validator0"
+validator0_address=$($ChainCMD keys show validator0 -a --home="${NodeDic[0]}" --keyring-backend $KeyRingBackEndType)
+$ChainCMD add-genesis-account "${validator0_address}" ${TotalStake} --root-admin --home=$Home --keyring-backend $KeyRingBackEndType
 PointOwner=$($ChainCMD keys show admin -a --keyring-backend $KeyRingBackEndType)
-$ChainCMD add-genesis-account "${PointOwner}" 1000000000000000${Point} --home $Home --keyring-backend $KeyRingBackEndType
-
-echo "################################ added genesis account"
+$ChainCMD add-genesis-account "${PointOwner}" 1000000000000000${Point} --home=$Home --keyring-backend $KeyRingBackEndType
 
 ## generate root.key and root.crt
 openssl ecparam -genkey -name SM2 -out $Home/root.key
 echo -e "CN\nSH\nSH\nIT\nDEV\n'${NodeNames[0]}'\n\n" | openssl req -new -x509 -sm3 -sigopt "distid:1234567812345678" -key $Home/root.key -out $Home/root.crt -days 3650
 # set root cert
-$ChainCMD set-root-cert $Home/root.crt --home $Home
-
-echo "################################ set root cert"
+$ChainCMD set-root-cert $Home/root.crt --home=$Home
 
 for i in {0..3}; do
     # generate validator.crt
@@ -116,14 +114,14 @@ for i in {0..3}; do
 done
 
 # set node0 is genesis validator(first validator)
-echo ${Password} | $ChainCMD add-genesis-validator --name ${NodeNames[0]} --cert "${NodeDic[0]}/validator.crt" --power 10000 --from validator0 --home $Home --keyring-backend $KeyRingBackEndType
+echo ${Password} | $ChainCMD add-genesis-validator --name ${NodeNames[0]} --cert "${NodeDic[0]}/validator.crt" --power 10000 --from validator0 --home=$Home --keyring-backend $KeyRingBackEndType
 
 #sed -i "s/persistent_peers = \"\"/persistent_peers = \"$($ChainCMD tendermint show-node-id --home=${NodeDic[0]} | sed 's/\^M\$//')@`echo ${NodeIP[0]} | awk -F // '{print $2}'`:26656,$($ChainCMD tendermint show-node-id --home=${NodeDic[1]} | sed 's/\^M\$//')@`echo ${NodeIP[0]} | awk -F // '{print $2}'`:36656,$($ChainCMD tendermint show-node-id --home=${NodeDic[2]} | sed 's/\^M\$//')@`echo ${NodeIP[0]} | awk -F // '{print $2}'`:46656,$($ChainCMD tendermint show-node-id --home=${NodeDic[3]} | sed 's/\^M\$//')@`echo ${NodeIP[0]} | awk -F // '{print $2}'`:56656\"/" $Home/config/config.toml
-sed -i "s/persistent_peers = \"\"/persistent_peers = \"$($ChainCMD tendermint show-node-id --home "${NodeDic[0]}" | sed 's/\^M\$//')@`echo "${NodeIP[0]}" | awk -F // '{print $2}'`:26656\"/" $Home/config/config.toml
+sed -i "s/persistent_peers = \"\"/persistent_peers = \"$($ChainCMD tendermint show-node-id --home="${NodeDic[0]}" | sed 's/\^M\$//')@`echo "${NodeIP[0]}" | awk -F // '{print $2}'`:26656\"/" $Home/config/config.toml
 
 for i in {0..3}; do
    echo "node ${NodeDic[0]} id is";
-   $ChainCMD tendermint show-node-id --home "${NodeDic[0]}" | sed 's/\^M\$//';
+   $ChainCMD tendermint show-node-id --home="${NodeDic[0]}" | sed 's/\^M\$//';
 done
 
 # Copy config files unerder folder config to other nodes
@@ -158,8 +156,26 @@ done
 
 # start node 0
 # cosmos sdk no logger https://github.com/cosmos/cosmos-sdk/issues/5050
-irita start  --pruning=nothing --home ${NodeDic[0]} > ${NodeDic[0]}/node.log  2>&1 &
-echo "container node0 started"
+# node0 endPoints
+# Tendermint config
+# gRPC server port 26657
+# pprof server port 6060
+# p2p port 26656
+#-----------------------------------------
+# cosmos sdk config
+# REST API server port 1317
+# gRPC server port 9090
+# gRPC web port 9091
+# JSON-RPC server port 8545 / JSON-RPC ws port 8546
+if [ "$DockerFlag" == "docker" ]; then
+   docker run -d -p26657:26657 -p26656:26656 --mount type=bind,source=$PWD/testnet,target=/home --mount type=bind,source=$HomeUserPath/.irita,target=/root/.irita --name ${NodeNames[0]} bianjieai/irita irita start --pruning=nothing --home=/home/${NodeNames[0]}
+   echo "container node0 started"
+else
+   # start node 0
+   # cosmos sdk no logger https://github.com/cosmos/cosmos-sdk/issues/5050
+   irita start  --pruning=nothing --home ${NodeDic[0]} > ${NodeDic[0]}/node.log  2>&1 &
+   echo "node0 started"
+fi
 sleep 10
 
 # Join validators from node 1 - 3
@@ -185,10 +201,50 @@ for i in {1..3}; do
    sleep 2
 done
 
+# node1 endPoints
+# Tendermint config
+# gRPC server port 36657
+# pprof server port 36060
+# p2p port 36656
+#-----------------------------------------
+# cosmos sdk config
+# REST API server port 31317
+# gRPC server port 39090
+# gRPC web port 39091
+# JSON-RPC server port 38545 / JSON-RPC ws port 38546
+
+# node2 endPoints
+# Tendermint config
+# gRPC server port 46657
+# pprof server port 46060
+# p2p port 46656
+#-----------------------------------------
+# cosmos sdk config
+# REST API server port 41317
+# gRPC server port 49090
+# gRPC web port 49091
+# JSON-RPC server port 48545 / JSON-RPC ws port 48546
+
+# node3 endPoints
+# Tendermint config
+# gRPC server port 56657
+# pprof server port 56060
+# p2p port 56656
+#-----------------------------------------
+# cosmos sdk config
+# REST API server port 51317
+# gRPC server port 59090
+# gRPC web port 59091
+# JSON-RPC server port 58545 / JSON-RPC ws port 58546
 # start node 1 - 3
 for i in {1..3}; do
    port_prefix=$(($i + 2))
-   irita start  --pruning=nothing --home=${NodeDic[$i]} --rpc.laddr="tcp://0.0.0.0:${port_prefix}6657" --p2p.laddr="tcp://0.0.0.0:${port_prefix}6656" > ${NodeDic[$i]}/node.log 2>&1 &
-   echo "${NodeNames[$i]} started"
+   if [ "$DockerFlag" == "docker" ]; then
+      docker run -d -p${port_prefix}6657:26657 -p${port_prefix}6656:26656 --mount type=bind,source=$PWD/testnet,target=/home --mount type=bind,source=$HomeUserPath/.irita,target=/root/.irita --name ${NodeNames[$i]} bianjieai/irita irita start --pruning=nothing --home=/home/${NodeNames[$i]} --rpc.laddr=tcp://0.0.0.0:26657 --p2p.laddr=tcp://0.0.0.0:26656
+      echo "container ${NodeNames[$i]} started"
+   else
+      irita start  --pruning=nothing --home=${NodeDic[$i]} --rpc.laddr="tcp://0.0.0.0:${port_prefix}6657" --p2p.laddr="tcp://0.0.0.0:${port_prefix}6656" > ${NodeDic[$i]}/node.log 2>&1 &
+      echo "${NodeNames[$i]} started"
+   fi
 done
 echo "All started Finished"
