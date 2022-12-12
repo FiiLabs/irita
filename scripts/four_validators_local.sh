@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-# How to use this script: ./script/prod/four_validators_local.sh <docker | empty>
+# How to use this script: ./script/prod/four_validators_local.sh <docker | local> <genconfig>
 # docker: run docker container
-# empty: run irita directly
+# local: run irita directly
+# genconfig: only generate config Home directory
 
 Home=./testnet
 HomeUserPath=$HOME
@@ -31,6 +32,7 @@ Password=12345678
 # https://docs.cosmos.network/v0.46/run-node/keyring.html
 KeyRingBackEndType="file"
 DockerFlag=$1
+GenConfigFlag=$2
 DockerImageName="mathxh/fiilabs"
 
 
@@ -38,10 +40,10 @@ rm -rf "$Home"
 
 $ChainCMD config keyring-backend $KeyRingBackEndType
 
-echo -e "${Password}" | $ChainCMD keys delete admin -y --home "$Home" --keyring-backend $KeyRingBackEndType
+echo -e "${Password}" | $ChainCMD keys delete admin -y --keyring-backend $KeyRingBackEndType
 # delete all validators related keys and docker container names
 for i in {0..3}; do  
-   echo -e "${Password}" | $ChainCMD keys delete "${Validators[$i]}" -y --home "${NodeDic[$i]}" --keyring-backend $KeyRingBackEndType;
+   echo -e "${Password}" | $ChainCMD keys delete "${Validators[$i]}" -y  --keyring-backend $KeyRingBackEndType;
    if [ "$DockerFlag" == "docker" ]; then
       docker container rm "${NodeNames[$i]}";
    fi
@@ -49,13 +51,13 @@ done
 
 # Add related accounts
 echo "please input Mnemonics: ${Mnemonics[4]}"
-${ChainCMD} keys add admin --recover --home "$Home" --keyring-backend $KeyRingBackEndType
+${ChainCMD} keys add admin --recover  --keyring-backend $KeyRingBackEndType
 # (echo "setup capital exact dad minimum pigeon blush claw cake find animal torch cry guide dirt settle parade host grief lunar indicate laptop bulk cherry"; echo "12345678", echo "12345678") | sudo -E irita keys add admin --recover
 # (echo "12345678"; echo "12345678") | sudo -E irita keys add admin
 
 for i in {0..3}; do
    echo "please input Mnemonics: ${Mnemonics[$i]}";
-   ${ChainCMD} keys add "${Validators[$i]}" --recover --home "${NodeDic[$i]}" --keyring-backend $KeyRingBackEndType;
+   ${ChainCMD} keys add "${Validators[$i]}" --recover  --keyring-backend $KeyRingBackEndType;
 done
 
 # for generating a temaplate genesis.json for change it and copy
@@ -202,6 +204,13 @@ for i in {1..3}; do
    sleep 2
 done
 
+if [ "$GenConfigFlag" == "genconfig" ]; then
+   sudo pkill -f irita
+   c=$(docker ps -q) && [[ $c ]] && docker kill $c
+   echo "all config of four validators generate finished"
+fi
+
+
 # node1 endPoints
 # Tendermint config
 # gRPC server port 36657
@@ -238,14 +247,16 @@ done
 # gRPC web port 59091
 # JSON-RPC server port 58545 / JSON-RPC ws port 58546
 # start node 1 - 3
-for i in {1..3}; do
-   port_prefix=$(($i + 2))
-   if [ "$DockerFlag" == "docker" ]; then
-      docker run -d -p${port_prefix}6657:26657 -p${port_prefix}6656:26656 --mount type=bind,source=$PWD/testnet,target=/home --mount type=bind,source=$HomeUserPath/.irita,target=/root/.irita --name ${NodeNames[$i]} ${DockerImageName} irita start --pruning=nothing --home=/home/${NodeNames[$i]} --rpc.laddr=tcp://0.0.0.0:26657 --p2p.laddr=tcp://0.0.0.0:26656
-      echo "container ${NodeNames[$i]} started"
-   else
-      irita start  --pruning=nothing --home=${NodeDic[$i]} --rpc.laddr="tcp://0.0.0.0:${port_prefix}6657" --p2p.laddr="tcp://0.0.0.0:${port_prefix}6656" > ${NodeDic[$i]}/node.log 2>&1 &
-      echo "${NodeNames[$i]} started"
-   fi
-done
-echo "All started Finished"
+if [ "$GenConfigFlag" != "genconfig" ]; then
+   for i in {1..3}; do
+      port_prefix=$(($i + 2))
+      if [ "$DockerFlag" == "docker" ]; then
+         docker run -d -p${port_prefix}6657:26657 -p${port_prefix}6656:26656 --mount type=bind,source=$PWD/testnet,target=/home --mount type=bind,source=$HomeUserPath/.irita,target=/root/.irita --name ${NodeNames[$i]} ${DockerImageName} irita start --pruning=nothing --home=/home/${NodeNames[$i]} --rpc.laddr=tcp://0.0.0.0:26657 --p2p.laddr=tcp://0.0.0.0:26656
+         echo "container ${NodeNames[$i]} started"
+      else
+         irita start  --pruning=nothing --home=${NodeDic[$i]} --rpc.laddr="tcp://0.0.0.0:${port_prefix}6657" --p2p.laddr="tcp://0.0.0.0:${port_prefix}6656" > ${NodeDic[$i]}/node.log 2>&1 &
+         echo "${NodeNames[$i]} started"
+      fi
+   done
+   echo "All started Finished"
+fi
