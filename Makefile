@@ -171,7 +171,7 @@ benchmark:
 ########################################
 ### Local validator nodes using docker and docker-compose
 build-docker-iritanode:
-	docker build -t bianjieai/irita .
+	docker build -t mathxh/fiilabs .
 
 localtestnet-init:
 	@if ! [ -f build/nodecluster/node0/irita/config/genesis.json ]; then docker run --rm -v $(CURDIR)/build:/home bianjieai/irita irita testnet --v 4 --output-dir /home/nodecluster --chain-id irita-test --keyring-backend test --starting-ip-address 192.168.10.2 ; fi
