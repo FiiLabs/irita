@@ -50,13 +50,37 @@ bash `./scripts/four_validators_local.sh`
 
 先登录要部署node0(validator0)的节点云服务器
 
+在本地编译安装完irita的前提下。
+
+```bash
+sudo apt install jq
+wget https://studygolang.com/dl/golang/go1.19.4.linux-amd64.tar.gz
+sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.14.3.linux-amd64.tar.gz
+export PATH=$PATH:/usr/local/go/bin
+go version
+go env -w GOPROXY=https://goproxy.cn
+git clone https://github.com/FiiLabs/irita.git 
+cd irita
+git checkout origin/develop-release-3.2.4
+git switch -c develop-release-3.2.4
+cp ./image-deps/openssl-3.0.0-alpha4.tar.gz ../
+cd ..
+tar -xzvf openssl-3.0.0-alpha4.tar.gz
+cd openssl-3.0.0-alpha4
+./config
+sudo make install
+cd irita
+make build
+sudo ln -s /home/ubuntu/irita/build/irita /usr/local/bin/irita
+```
+
 运行
 
 ```bash
-./scripts/four_validators_local.sh "docker"
+./scripts/four_validators_local.sh docker
 ```
 
-运行这个命令以后，你用docker ps会看到node0 - node3的四个容器启动，相应的数据和配置都已经生成在testnet目录底下。手动docker kill node1-node3的容器，因为用不到。
+运行这个命令以后，你用docker ps会看到node0 - node3的四个容器启动，相应的数据和配置都已经生成在testnet目录底下。手动docker kill node1-node3的容器，因为在这台服务器上用不到。
 
 把在node0所在的服务器的Keys所保存在的目录，和--home指定的testnet目录下的数据 拷贝到剩下的3台要部署的validator1-validator3的服务器上
 
