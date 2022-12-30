@@ -18,6 +18,7 @@ import (
 	"github.com/tendermint/tendermint/store"
 	"github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
+	sm "github.com/tendermint/tendermint/state"
 )
 
 const (
@@ -81,7 +82,9 @@ func Snapshot(dataDir, targetDir string) error {
 	blockStore := store.NewBlockStore(blockDB)
 
 	stateDB := loadDb(stateStoreDir, dataDir)
-	ss := state.NewStore(stateDB)
+	ss := state.NewStore(stateDB,sm.StoreOptions{
+		DiscardABCIResponses: false,
+	})
 
 	defer func() {
 		blockDB.Close()
@@ -123,8 +126,12 @@ func snapshotState(tmDB *dbm.GoLevelDB, targetDir string, height int64) {
 	targetDb := loadDb(stateStoreDir, targetDir)
 	defer targetDb.Close()
 
-	newStore := state.NewStore(targetDb)
-	oldStore := state.NewStore(tmDB)
+	newStore := state.NewStore(targetDb, sm.StoreOptions{
+		DiscardABCIResponses: false,
+	})
+	oldStore := state.NewStore(tmDB, sm.StoreOptions{
+		DiscardABCIResponses: false,
+	})
 
 	state, err := oldStore.Load()
 	if err != nil {

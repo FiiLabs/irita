@@ -1,7 +1,7 @@
-#!/usr/bin/env bash
+#!/bin/sh
 Home=./testnet
 ChainID=testnet # chain-id
-ChainCMD=irita
+ChainCMD=./build/irita
 NodeName=irita-node # node name
 NodeIP=(tcp://127.0.0.1 tcp://127.0.0.1 tcp://127.0.0.1 tcp://127.0.0.1)
 NodeNames=("node0" "node1" "node2" "node3")
@@ -13,40 +13,27 @@ Mnemonics=("eagle marriage host height topple sorry exist nation screen affair b
 )
 Stake=uirita
 TotalStake=10000000000000000${Stake} # total stake in genesis
-# SendStake=10000000000000${Stake}
-# DataPath=/tmp
+SendStake=10000000000000${Stake}
+DataPath=/tmp
 
 Point=upoint
 PointOwner=iaa1g6gqr3s58dhw3jq5hm95qrng0sa9um7gavevjc # replace with actual address
-# PointToken=$(echo \{\"symbol\": \"point\", \"name\": \"Irita point native token\", \"scale\": 6, \"min_unit\": \"upoint\", \"initial_supply\": \"1000000000\", \"max_supply\": \"1000000000000\", \"mintable\": true, \"owner\": \"${PointOwner}\"\})
-
-rm -rf "$Home"
-# rm -rf /home/mathxh/.irita
-
 PointToken=`echo {\"symbol\": \"point\", \"name\": \"Irita point native token\", \"scale\": 6, \"min_unit\": \"upoint\", \"initial_supply\": \"1000000000\", \"max_supply\": \"1000000000000\", \"mintable\": true, \"owner\": \"${PointOwner}\"},{\"symbol\": \"gas\", \"name\": \"IRITA Fee Token\", \"scale\": 18, \"min_unit\": \"ugas\", \"initial_supply\": \"1000000000\", \"max_supply\": \"10000000000000000\", \"mintable\": true, \"owner\": \"${PointOwner}\"}`
 AddedToken=`echo {\"denom\": \"ugas\",\"amount\": \"5000000000000000000000\"},{\"denom\": \"uirita\",\"amount\": \"10000000000000000\"},{\"denom\": \"upoint\",\"amount\": \"5000000000\"}`
 
 $ChainCMD keys delete admin -y
 $ChainCMD keys delete validator0 -y
 
-admin_secret_info="${Mnemonics[4]}
-12345678
-12345678
-"
-
-validator0_secret_info="${Mnemonics[0]}
-12345678
-12345678
-"
-
-$ChainCMD keys add admin --recover --home=$Home <<< "${admin_secret_info}"
-$ChainCMD keys add validator0 --recover --home=$Home <<< "${validator0_secret_info}"
+bash -c "echo -e \"${Mnemonics[4]}\n12345678\n12345678\" | ${ChainCMD} keys add admin --recover --home=$Home"
+bash -c "echo -e \"${Mnemonics[0]}\n12345678\n12345678\" | ${ChainCMD} keys add validator0 --recover --home=$Home"
 
 $ChainCMD init moniker --chain-id $ChainID --home=$Home
 
 $ChainCMD genkey --out-file $Home/priv_validator.pem --home=$Home
+$ChainCMD genkey --out-file $Home/priv_validator1.pem --home=$Home
 
 $ChainCMD genkey --type node --out-file $Home/priv_node.pem --home=$Home
+$ChainCMD genkey --type node --out-file $Home/priv_node1.pem --home=$Home
 
 sed -i 's/127.0.0.1:26657/0.0.0.0:26657/g' $Home/config/config.toml
 
@@ -108,11 +95,19 @@ $ChainCMD set-root-cert $Home/root.crt --home=$Home
 
 echo -e "CN\nSH\nSH\nIT\nDEV\n'${NodeNames[0]}'\n\n\n\n" | openssl req -new -key $Home/priv_validator.pem -out $Home/validator_req.csr -sm3 -sigopt "distid:1234567812345678"
 
+echo -e "CN\nSH\nSH\nIT\nDEV\n'${NodeNames[1]}'\n\n\n\n" | openssl req -new -key $Home/priv_validator1.pem -out $Home/validator_req1.csr -sm3 -sigopt "distid:1234567812345678"
+
 openssl x509 -req -in $Home/validator_req.csr -out $Home/validator.crt -sm3 -sigopt "distid:1234567812345678" -vfyopt "distid:1234567812345678" -CA $Home/root.crt -CAkey $Home/root.key -CAcreateserial
+
+openssl x509 -req -in $Home/validator_req1.csr -out $Home/validator1.crt -sm3 -sigopt "distid:1234567812345678" -vfyopt "distid:1234567812345678" -CA $Home/root.crt -CAkey $Home/root.key -CAcreateserial
 
 echo -e "CN\nSH\nSH\nIT\nDEV\n'${NodeNames[0]}'\n\n\n\n" | openssl req -new -key $Home/priv_node.pem -out $Home/node_req.csr -sm3 -sigopt "distid:1234567812345678"
 
+echo -e "CN\nSH\nSH\nIT\nDEV\n'${NodeNames[1]}'\n\n\n\n" | openssl req -new -key $Home/priv_node1.pem -out $Home/node_req1.csr -sm3 -sigopt "distid:1234567812345678"
+
 openssl x509 -req -in $Home/node_req.csr -out $Home/node.crt -sm3 -sigopt "distid:1234567812345678" -vfyopt "distid:1234567812345678" -CA $Home/root.crt -CAkey $Home/root.key -CAcreateserial
+
+openssl x509 -req -in $Home/node_req1.csr -out $Home/node1.crt -sm3 -sigopt "distid:1234567812345678" -vfyopt "distid:1234567812345678" -CA $Home/root.crt -CAkey $Home/root.key -CAcreateserial
 
 bash -c "echo 12345678 | $ChainCMD add-genesis-validator --name ${NodeNames[0]} --cert $Home/validator.crt --power 10000 --from validator0 --home=$Home"
 
