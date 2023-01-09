@@ -3,26 +3,26 @@
 set -eo pipefail
 
 
-IRISMOD_VERSION=v1.4.0
-IRITAMOD_VERSION=v1.0.0
-SDK_VERSION=v0.42.3-irita-210413
-WASMD_VERSION=v0.15.1
-WASMD_PROTO_DIR=x/wasm/internal/types
+IRISMOD_VERSION=v1.6.1-0.20221111024000-7b4378c3988b
+IRITAMOD_VERSION=v1.3.0
+SDK_VERSION=v0.45.1-irita-20221230
+WASMD_VERSION=v0.19.1-0.20211215102105-45e28c7c896c
+#WASMD_PROTO_DIR=x/wasm/internal/types
 
-chmod -R 755 ${GOPATH}/pkg/mod/github.com/bianjieai/cosmos-sdk@${SDK_VERSION}/proto
-chmod -R 755 ${GOPATH}/pkg/mod/github.com/bianjieai/cosmos-sdk@${SDK_VERSION}/third_party/proto
+chmod -R 755 ${GOPATH}/pkg/mod/github.com/!fii!labs/cosmos-sdk@${SDK_VERSION}/proto
+chmod -R 755 ${GOPATH}/pkg/mod/github.com/!fii!labs/cosmos-sdk@${SDK_VERSION}/third_party/proto
 chmod -R 755 ${GOPATH}/pkg/mod/github.com/irisnet/irismod@${IRISMOD_VERSION}/proto
 chmod -R 755 ${GOPATH}/pkg/mod/github.com/bianjieai/iritamod@${IRITAMOD_VERSION}/proto
-chmod -R 755 ${GOPATH}/pkg/mod/github.com/!cosm!wasm/wasmd@${WASMD_VERSION}/${WASMD_PROTO_DIR}
+#chmod -R 755 ${GOPATH}/pkg/mod/github.com/bianjieai/wasmd@${WASMD_VERSION}/${WASMD_PROTO_DIR}
 
 rm -rf ./tmp-swagger-gen ./tmp && mkdir -p ./tmp-swagger-gen ./tmp/proto ./tmp/third_party
 
-cp -r ${GOPATH}/pkg/mod/github.com/bianjieai/cosmos-sdk@${SDK_VERSION}/proto ./tmp && rm -rf ./tmp/proto/cosmos/mint
-cp -r ${GOPATH}/pkg/mod/github.com/bianjieai/cosmos-sdk@${SDK_VERSION}/third_party/proto ./tmp/third_party
+cp -r ${GOPATH}/pkg/mod/github.com/!fii!labs/cosmos-sdk@${SDK_VERSION}/proto ./tmp && rm -rf ./tmp/proto/cosmos/mint
+cp -r ${GOPATH}/pkg/mod/github.com/!fii!labs/cosmos-sdk@${SDK_VERSION}/third_party/proto ./tmp/third_party
 cp -r ${GOPATH}/pkg/mod/github.com/irisnet/irismod@${IRISMOD_VERSION}/proto ./tmp
 cp -r ${GOPATH}/pkg/mod/github.com/bianjieai/iritamod@${IRITAMOD_VERSION}/proto ./tmp
-mkdir -p ./tmp/proto/${WASMD_PROTO_DIR}
-cp -r ${GOPATH}/pkg/mod/github.com/!cosm!wasm/wasmd@${WASMD_VERSION}/${WASMD_PROTO_DIR}/*.proto ./tmp/proto/${WASMD_PROTO_DIR}
+#mkdir -p ./tmp/proto/${WASMD_PROTO_DIR}
+#cp -r ${GOPATH}/pkg/mod/github.com/bianjieai/wasmd@${WASMD_VERSION}/${WASMD_PROTO_DIR}/*.proto ./tmp/proto/${WASMD_PROTO_DIR}
 cp -r ./proto ./tmp
 cp -r ./third_party/proto/cosmos ./tmp/third_party/proto/cosmos
 
@@ -45,8 +45,8 @@ for dir in $proto_dirs; do
 done
 
 # copy cosmos swagger_legacy.yaml
-chmod -R 755 ${GOPATH}/pkg/mod/github.com/bianjieai/cosmos-sdk@${SDK_VERSION}/client/docs/swagger_legacy.yaml
-cp -r ${GOPATH}/pkg/mod/github.com/bianjieai/cosmos-sdk@${SDK_VERSION}/client/docs/swagger_legacy.yaml ./lite/cosmos_swagger_legacy.yaml
+chmod -R 755 ${GOPATH}/pkg/mod/github.com/!fii!labs/cosmos-sdk@${SDK_VERSION}/client/docs/swagger_legacy.yaml
+cp -r ${GOPATH}/pkg/mod/github.com/!fii!labs/cosmos-sdk@${SDK_VERSION}/client/docs/swagger_legacy.yaml ./lite/cosmos_swagger_legacy.yaml
 
 # combine swagger files
 # uses nodejs package `swagger-combine`.
@@ -54,12 +54,12 @@ cp -r ${GOPATH}/pkg/mod/github.com/bianjieai/cosmos-sdk@${SDK_VERSION}/client/do
 swagger-combine ./lite/config.json -o ./lite/swagger-ui/swagger.yaml -f yaml --continueOnConflictingPaths true --includeDefinitions true
 
 # replace APIs example
-sed -r -i '' 's/cosmos1[a-z,0-9]+/iaa1sltcyjm5k0edlg59t47lsyw8gtgc3nudklntcq/g' ./lite/swagger-ui/swagger.yaml
-sed -r -i '' 's/cosmosvaloper1[a-z,0-9]+/iva1sltcyjm5k0edlg59t47lsyw8gtgc3nudrwey98/g' ./lite/swagger-ui/swagger.yaml
-sed -r -i '' 's/cosmosvalconspub1[a-z,0-9]+/icp1zcjduepqwhwqn4h5v6mqa7k3kmy7cjzchsx5ptsrqaulwrgfmghy3k9jtdzs6rdddm/g' ./lite/swagger-ui/swagger.yaml
-sed -i '' 's/Gaia/IRITA/g' ./lite/swagger-ui/swagger.yaml
-sed -i '' 's/gaia/irita/g' ./lite/swagger-ui/swagger.yaml
-sed -i '' 's/cosmoshub/IRITA/g' ./lite/swagger-ui/swagger.yaml
+sed -r -i 's/cosmos1[a-z,0-9]+/iaa1sltcyjm5k0edlg59t47lsyw8gtgc3nudklntcq/g' ./lite/swagger-ui/swagger.yaml
+sed -r -i  's/cosmosvaloper1[a-z,0-9]+/iva1sltcyjm5k0edlg59t47lsyw8gtgc3nudrwey98/g' ./lite/swagger-ui/swagger.yaml
+sed -r -i  's/cosmosvalconspub1[a-z,0-9]+/icp1zcjduepqwhwqn4h5v6mqa7k3kmy7cjzchsx5ptsrqaulwrgfmghy3k9jtdzs6rdddm/g' ./lite/swagger-ui/swagger.yaml
+sed -i  's/Gaia/IRITA/g' ./lite/swagger-ui/swagger.yaml
+sed -i  's/gaia/metaosd/g' ./lite/swagger-ui/swagger.yaml
+sed -i  's/cosmoshub/IRITA/g' ./lite/swagger-ui/swagger.yaml
 
 # clean swagger files
 rm -rf ./tmp-swagger-gen

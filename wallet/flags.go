@@ -15,5 +15,5 @@ const (
 )
 
 var (
-	DefaultWalletHome = os.ExpandEnv("$HOME/.iritawallet")
+	DefaultWalletHome = os.ExpandEnv("$HOME/.metawallet")
 )

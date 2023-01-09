@@ -1,8 +1,8 @@
 #!/bin/sh
 Home=./testnet
 ChainID=testnet # chain-id
-ChainCMD=./build/irita
-NodeName=irita-node # node name
+ChainCMD=./build/metaos
+NodeName=metaos-node # node name
 NodeIP=(tcp://127.0.0.1 tcp://127.0.0.1 tcp://127.0.0.1 tcp://127.0.0.1)
 NodeNames=("node0" "node1" "node2" "node3")
 NodeDic=("${Home}/node0" "${Home}/node1" "${Home}/node2" "${Home}/node3")

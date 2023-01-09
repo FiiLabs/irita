@@ -1,9 +1,9 @@
 syntax = "proto3";
-package irita.wservice;
+package metaos.wservice;
 
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/bianjieai/irita/modules/wservice/types";
+option go_package = "github.com/bianjieai/metaos/modules/wservice/types";
 option (gogoproto.goproto_getters_all) = false;
 
 message RequestSequence {

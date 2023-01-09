@@ -106,14 +106,6 @@
                     "Params": "IdentityParams"
                 }
             }
-        },
-        {
-            "url": "./tmp-swagger-gen/x/wasm/internal/types/query.swagger.json",
-            "operationIds": {
-                "rename": {
-                    "Params": "WasmParams"
-                }
-            }
         }
     ]
 }

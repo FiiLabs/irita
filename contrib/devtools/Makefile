@@ -112,10 +112,15 @@ endif
 buf: buf-stamp
 
 buf-stamp:
+ifeq (, $(shell which buf))
 	@echo "Installing buf..."
 	@curl -sSL \
-    "https://github.com/bufbuild/buf/releases/download/v${BUF_VERSION}/buf-${UNAME_S}-${UNAME_M}" \
-    -o "${BIN}/buf" && \
+    "https://github.com/bufbuild/buf/releases/download/v1.11.0/buf-${UNAME_S}-${UNAME_M}" \
+    -o "./buf" && sudo mv "./buf" "${BIN}/buf"&& \
 	chmod +x "${BIN}/buf"
 
 	touch $@
+else
+	@echo "buf already installed; skipping..."
+endif
+

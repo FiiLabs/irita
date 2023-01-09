@@ -1,5 +1,5 @@
 #
-# Build image: docker build -t bianjie/irita .
+# Build image: docker build -t bianjie/metaosd .
 #
 FROM golang:1.19.3-alpine3.17 as builder
 

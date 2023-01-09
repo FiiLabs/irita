@@ -2,14 +2,14 @@
 
 # How to use this script: ./script/prod/four_validators_local.sh <docker | local> <genconfig>
 # docker: run docker container
-# local: run irita directly
+# local: run metaosd directly
 # genconfig: only generate config Home directory
 
 Home=./testnet
 HomeUserPath=$HOME
 ChainID=testnet # chain-id
 ChainCMD="irita"
-NodeName=irita-node # node name
+NodeName=metaos-node # node name
 NodeIP=(tcp://127.0.0.1 tcp://127.0.0.1 tcp://127.0.0.1 tcp://127.0.0.1)
 NodeNames=("node0" "node1" "node2" "node3")
 NodeDic=("${Home}/node0" "${Home}/node1" "${Home}/node2" "${Home}/node3")
@@ -33,7 +33,7 @@ Password=12345678
 KeyRingBackEndType="file"
 DockerFlag=$1
 GenConfigFlag=$2
-DockerImageName="mathxh/fiilabs"
+DockerImageName="mathxh/bianjieai"
 
 
 rm -rf "$Home"
@@ -52,8 +52,8 @@ done
 # Add related accounts
 echo "please input Mnemonics: ${Mnemonics[4]}"
 ${ChainCMD} keys add admin --recover  --keyring-backend $KeyRingBackEndType
-# (echo "setup capital exact dad minimum pigeon blush claw cake find animal torch cry guide dirt settle parade host grief lunar indicate laptop bulk cherry"; echo "12345678", echo "12345678") | sudo -E irita keys add admin --recover
-# (echo "12345678"; echo "12345678") | sudo -E irita keys add admin
+# (echo "setup capital exact dad minimum pigeon blush claw cake find animal torch cry guide dirt settle parade host grief lunar indicate laptop bulk cherry"; echo "12345678", echo "12345678") | sudo -E metaosd keys add admin --recover
+# (echo "12345678"; echo "12345678") | sudo -E metaosd keys add admin
 
 for i in {0..3}; do
    echo "please input Mnemonics: ${Mnemonics[$i]}";
@@ -171,12 +171,12 @@ done
 # gRPC web port 9091
 # JSON-RPC server port 8545 / JSON-RPC ws port 8546
 if [ "$DockerFlag" == "docker" ]; then
-   docker run -d -p26657:26657 -p26656:26656 --mount type=bind,source=$PWD/testnet,target=/home --mount type=bind,source=$HomeUserPath/.irita,target=/root/.irita --name ${NodeNames[0]} ${DockerImageName} irita start --pruning=nothing --home=/home/${NodeNames[0]}
+   docker run -d -p26657:26657 -p26656:26656 --mount type=bind,source=$PWD/testnet,target=/home --mount type=bind,source=$HomeUserPath/.metaos,target=/root/.metaos --name ${NodeNames[0]} ${DockerImageName} metaos start --pruning=nothing --home=/home/${NodeNames[0]}
    echo "container node0 started"
 else
    # start node 0
    # cosmos sdk no logger https://github.com/cosmos/cosmos-sdk/issues/5050
-   irita start  --pruning=nothing --home ${NodeDic[0]} > ${NodeDic[0]}/node.log  2>&1 &
+   metaos start  --pruning=nothing --home ${NodeDic[0]} > ${NodeDic[0]}/node.log  2>&1 &
    echo "node0 started"
 fi
 sleep 10
@@ -205,7 +205,7 @@ for i in {1..3}; do
 done
 
 if [ "$GenConfigFlag" == "genconfig" ]; then
-   sudo pkill -f irita
+   sudo pkill -f metaos
    c=$(docker ps -q) && [[ $c ]] && docker kill $c
    echo "all config of four validators generate finished"
 fi
@@ -251,10 +251,10 @@ if [ "$GenConfigFlag" != "genconfig" ]; then
    for i in {1..3}; do
       port_prefix=$(($i + 2))
       if [ "$DockerFlag" == "docker" ]; then
-         docker run -d -p${port_prefix}6657:26657 -p${port_prefix}6656:26656 --mount type=bind,source=$PWD/testnet,target=/home --mount type=bind,source=$HomeUserPath/.irita,target=/root/.irita --name ${NodeNames[$i]} ${DockerImageName} irita start --pruning=nothing --home=/home/${NodeNames[$i]} --rpc.laddr=tcp://0.0.0.0:26657 --p2p.laddr=tcp://0.0.0.0:26656
+         docker run -d -p${port_prefix}6657:26657 -p${port_prefix}6656:26656 --mount type=bind,source=$PWD/testnet,target=/home --mount type=bind,source=$HomeUserPath/.metaos,target=/root/.metaos --name ${NodeNames[$i]} ${DockerImageName} metaos start --pruning=nothing --home=/home/${NodeNames[$i]} --rpc.laddr=tcp://0.0.0.0:26657 --p2p.laddr=tcp://0.0.0.0:26656
          echo "container ${NodeNames[$i]} started"
       else
-         irita start  --pruning=nothing --home=${NodeDic[$i]} --rpc.laddr="tcp://0.0.0.0:${port_prefix}6657" --p2p.laddr="tcp://0.0.0.0:${port_prefix}6656" > ${NodeDic[$i]}/node.log 2>&1 &
+         metaos start  --pruning=nothing --home=${NodeDic[$i]} --rpc.laddr="tcp://0.0.0.0:${port_prefix}6657" --p2p.laddr="tcp://0.0.0.0:${port_prefix}6656" > ${NodeDic[$i]}/node.log 2>&1 &
          echo "${NodeNames[$i]} started"
       fi
    done

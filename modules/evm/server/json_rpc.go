@@ -16,7 +16,7 @@ import (
 
 	"github.com/tharsis/ethermint/server/config"
 
-	iritaevmrpc "github.com/bianjieai/irita/modules/evm/rpc"
+	metaevmrpc "github.com/bianjieai/irita/modules/evm/rpc"
 )
 
 // StartJSONRPC starts the JSON-RPC server
@@ -39,7 +39,7 @@ func StartJSONRPC(ctx *server.Context, clientCtx client.Context, tmRPCAddr, tmEn
 	rpcServer := ethrpc.NewServer()
 
 	rpcAPIArr := config.JSONRPC.API
-	apis := iritaevmrpc.GetRPCAPIs(ctx, clientCtx, tmWsClient, rpcAPIArr)
+	apis := metaevmrpc.GetRPCAPIs(ctx, clientCtx, tmWsClient, rpcAPIArr)
 
 	for _, api := range apis {
 		if err := rpcServer.RegisterName(api.Namespace, api.Service); err != nil {

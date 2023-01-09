@@ -40,7 +40,7 @@ func NewKeeper(cdc codec.Codec, key sdk.StoreKey, serviceKeeper servicekeeper.Ke
 
 // Logger returns a module-specific logger.
 func (k *Keeper) Logger(ctx sdk.Context) log.Logger {
-	return ctx.Logger().With("module", fmt.Sprintf("irita/%s", types.ModuleName))
+	return ctx.Logger().With("module", fmt.Sprintf("metaos/%s", types.ModuleName))
 }
 
 func (k *Keeper) SetReqSequence(ctx sdk.Context, reqSequence, value []byte) {

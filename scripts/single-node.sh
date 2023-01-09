@@ -1,8 +1,8 @@
 #!/bin/sh
 Home=./testnet
 ChainID=testnet # chain-id
-ChainCMD=./build/irita
-NodeName=irita-node # node name
+ChainCMD=./build/metaosd
+NodeName=metaos-node # node name
 NodeIP=(tcp://127.0.0.1 tcp://127.0.0.1 tcp://127.0.0.1 tcp://127.0.0.1)
 NodeNames=("node0" "node1" "node2" "node3")
 Mnemonics=("eagle marriage host height topple sorry exist nation screen affair bulk average medal flush candy alert amused alone hire clerk treat hybrid tip cake"
@@ -17,10 +17,11 @@ SendStake=10000000000000${Stake}
 DataPath=/tmp
 
 Point=upoint
-PointOwner=iaa1g6gqr3s58dhw3jq5hm95qrng0sa9um7gavevjc # replace with actual address
+PointOwner=metaosd1g6gqr3s58dhw3jq5hm95qrng0sa9um7g6d5znz # replace with actual address
 PointToken=`echo {\"symbol\": \"point\", \"name\": \"Irita point native token\", \"scale\": 6, \"min_unit\": \"upoint\", \"initial_supply\": \"1000000000\", \"max_supply\": \"1000000000000\", \"mintable\": true, \"owner\": \"${PointOwner}\"},{\"symbol\": \"gas\", \"name\": \"IRITA Fee Token\", \"scale\": 18, \"min_unit\": \"ugas\", \"initial_supply\": \"1000000000\", \"max_supply\": \"10000000000000000\", \"mintable\": true, \"owner\": \"${PointOwner}\"}`
 AddedToken=`echo {\"denom\": \"ugas\",\"amount\": \"5000000000000000000000\"},{\"denom\": \"uirita\",\"amount\": \"10000000000000000\"},{\"denom\": \"upoint\",\"amount\": \"5000000000\"}`
 
+rm -rf ./testnet
 $ChainCMD keys delete admin -y
 $ChainCMD keys delete validator0 -y
 

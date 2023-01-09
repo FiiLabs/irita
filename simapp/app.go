@@ -226,7 +226,7 @@ func init() {
 		panic(err)
 	}
 
-	DefaultNodeHome = filepath.Join(userHomeDir, ".irita")
+	DefaultNodeHome = filepath.Join(userHomeDir, ".metaosd")
 }
 
 // NewSimApp returns a reference to an initialized NewSimApp.

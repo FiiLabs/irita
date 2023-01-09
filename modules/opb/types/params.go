@@ -13,7 +13,7 @@ import (
 
 const (
 	// DefaultBaseTokenDenom is the denom of the base native token by default
-	DefaultBaseTokenDenom = "uirita"
+	DefaultBaseTokenDenom = "umeta"
 
 	// DefaultPointTokenDenom is the denom of the native point token by default
 	DefaultPointTokenDenom = "upoint"

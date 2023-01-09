@@ -50,16 +50,13 @@ build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
 
 # process linker flags
 
-ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=irita \
-		  -X github.com/cosmos/cosmos-sdk/version.AppName=irita \
+ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=metaos \
+		  -X github.com/cosmos/cosmos-sdk/version.AppName=metaosd \
 		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
 		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)" \
 		  -X github.com/tendermint/tendermint/crypto/algo.Algo=sm2 \
-		  -X github.com/bianjieai/irita/address.Bech32ChainPrefix=i \
-		  -X github.com/bianjieai/irita/address.PrefixAcc=a \
-		  -X github.com/bianjieai/irita/address.PrefixAddress=a \
-		  -X github.com/tharsis/ethermint/types.EvmChainID=1223
+		  -X github.com/tharsis/ethermint/types.EvmChainID=1974
 
 buildflags = -X github.com/tendermint/tendermint/crypto/algo.Algo=sm2
 
@@ -80,9 +77,9 @@ include contrib/devtools/Makefile
 
 build: go.sum
 ifeq ($(OS),Windows_NT)
-	go build $(BUILD_FLAGS) -o build/irita.exe ./cmd/irita
+	go build $(BUILD_FLAGS) -o build/metaosd.exe ./cmd/metaosd
 else
-	go build $(BUILD_FLAGS) -o build/irita ./cmd/irita
+	go build $(BUILD_FLAGS) -o build/metaosd ./cmd/metaosd
 endif
 
 build-linux: go.sum update-swagger-docs
@@ -96,7 +93,7 @@ else
 endif
 
 install: go.sum
-	go install $(BUILD_FLAGS) ./cmd/irita
+	go install $(BUILD_FLAGS) ./cmd/metaosd
 
 update-swagger-docs: statik proto-swagger-gen
 	$(BINDIR)/statik -src=lite/swagger-ui -dest=lite -f -m
@@ -122,7 +119,7 @@ go.sum: go.mod
 draw-deps:
 	@# requires brew install graphviz or apt-get install graphviz
 	go get github.com/RobotsAndPencils/goviz
-	@goviz -i ./cmd/irita -d 2 | dot -Tpng -o dependency-graph.png
+	@goviz -i ./cmd/metaosd -d 2 | dot -Tpng -o dependency-graph.png
 
 clean:
 	rm -rf snapcraft-local.yaml build/ tmp-swagger-gen/
@@ -166,30 +163,4 @@ format:
 
 benchmark:
 	@go test -mod=readonly -bench=. ./...
-
-
-########################################
-### Local validator nodes using docker and docker-compose
-build-docker-iritanode:
-	docker build -t mathxh/fiilabs .
-
-localtestnet-init:
-	@if ! [ -f build/nodecluster/node0/irita/config/genesis.json ]; then docker run --rm -v $(CURDIR)/build:/home bianjieai/irita irita testnet --v 4 --output-dir /home/nodecluster --chain-id irita-test --keyring-backend test --starting-ip-address 192.168.10.2 ; fi
-	@echo "To install jq command, please refer to this page: https://stedolan.github.io/jq/download/"
-	@cat build/nodecluster/node0/irita/config/genesis.json | jq '.app_state.auth.accounts+= [{"@type": "/cosmos.auth.v1beta1.BaseAccount","address":"iaa15qgqfqk8uuej8ykjcyf7nse5n2avph0m92cu4e"}]' | jq '.app_state.bank.balances+= [{"address":"iaa15qgqfqk8uuej8ykjcyf7nse5n2avph0m92cu4e","coins":[{"denom":"point","amount":"1000000000000"}]}]' > build/genesis_temp.json
-	@sudo cp build/genesis_temp.json build/nodecluster/node0/irita/config/genesis.json
-	@sudo cp build/genesis_temp.json build/nodecluster/node1/irita/config/genesis.json
-	@sudo cp build/genesis_temp.json build/nodecluster/node2/irita/config/genesis.json
-	@sudo cp build/genesis_temp.json build/nodecluster/node3/irita/config/genesis.json
-	@rm build/genesis_temp.json
-	@echo "Faucet address: iaa15qgqfqk8uuej8ykjcyf7nse5n2avph0m92cu4e"
-	@echo "Faucet coin amount: 1000000000000point"
-	@echo "Faucet key seed: tube lonely pause spring gym veteran know want grid tired taxi such same mesh charge orient bracket ozone concert once good quick dry boss"
-
-localtestnet-start: localnet-init localnet-stop
-	docker-compose up -d
-
-localtestnet-stop:
-	docker-compose down
-
 	

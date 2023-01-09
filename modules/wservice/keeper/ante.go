@@ -63,7 +63,6 @@ func (decorator *DeduplicationTxDecorator) validateCallServiceReqSequence(ctx sd
 		return nil
 	}
 
-	// 当是BSN特定需求的消息时 判断Providers 是否等于1
 	if len(msg.Providers) != 1 {
 		return sdkerrors.Wrapf(
 			types.ErrInvalidProviderLength,
@@ -71,7 +70,6 @@ func (decorator *DeduplicationTxDecorator) validateCallServiceReqSequence(ctx sd
 		)
 	}
 
-	// 获取全局timeout
 	timeout := serviceKeeper.MaxRequestTimeout(ctx)
 
 	suffix := input.Header.ID + "_" + input.Header.ReqSequence
@@ -109,7 +107,6 @@ func (decorator *DeduplicationTxDecorator) validateRespondServiceReqSequence(ctx
 		)
 	}
 
-	// 解析callService的参数
 	input := &types.Input{}
 	if err := json.Unmarshal([]byte(requestResp.Input), input); err != nil {
 		return sdkerrors.Wrapf(
@@ -118,7 +115,6 @@ func (decorator *DeduplicationTxDecorator) validateRespondServiceReqSequence(ctx
 		)
 	}
 
-	// 如果input没有包含 去重的参数，则直接返回
 	if len(input.Header.ReqSequence) == 0 || len(input.Header.ID) == 0 {
 		return nil
 	}
@@ -131,7 +127,6 @@ func (decorator *DeduplicationTxDecorator) validateRespondServiceReqSequence(ctx
 		)
 	}
 
-	// 如果input中有去重参数，但output没有，返回错误
 	if len(output.Header.ReqSequence) == 0 || len(output.Header.ID) == 0 {
 		return sdkerrors.Wrapf(
 			types.ErrInvalidOutput,
@@ -148,7 +143,6 @@ func (decorator *DeduplicationTxDecorator) validateRespondServiceReqSequence(ctx
 		)
 	}
 
-	// 断言err 肯定为空
 	requestProvider, _ := sdk.AccAddressFromBech32(requestResp.Provider)
 	if !providerAddr.Equals(requestProvider) {
 		return sdkerrors.Wrapf(

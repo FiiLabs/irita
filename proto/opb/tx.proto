@@ -1,9 +1,9 @@
 syntax = "proto3";
-package irita.opb;
+package metaos.opb;
 
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/bianjieai/irita/modules/opb/types";
+option go_package = "github.com/bianjieai/metaos/modules/opb/types";
 option (gogoproto.goproto_getters_all)  = false;
 
 // Msg defines the OPB Msg service.
