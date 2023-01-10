@@ -17,11 +17,11 @@ SendStake=10000000000000${Stake}
 DataPath=/tmp
 
 Point=upoint
-PointOwner=metaosd1g6gqr3s58dhw3jq5hm95qrng0sa9um7g6d5znz # replace with actual address
+PointOwner=metaos1g6gqr3s58dhw3jq5hm95qrng0sa9um7g2e2fcx # replace with actual address
 PointToken=`echo {\"symbol\": \"point\", \"name\": \"Irita point native token\", \"scale\": 6, \"min_unit\": \"upoint\", \"initial_supply\": \"1000000000\", \"max_supply\": \"1000000000000\", \"mintable\": true, \"owner\": \"${PointOwner}\"},{\"symbol\": \"gas\", \"name\": \"IRITA Fee Token\", \"scale\": 18, \"min_unit\": \"ugas\", \"initial_supply\": \"1000000000\", \"max_supply\": \"10000000000000000\", \"mintable\": true, \"owner\": \"${PointOwner}\"}`
 AddedToken=`echo {\"denom\": \"ugas\",\"amount\": \"5000000000000000000000\"},{\"denom\": \"uirita\",\"amount\": \"10000000000000000\"},{\"denom\": \"upoint\",\"amount\": \"5000000000\"}`
 
-rm -rf ./testnet
+rm -rf $Home
 $ChainCMD keys delete admin -y
 $ChainCMD keys delete validator0 -y
 

@@ -1,7 +1,7 @@
 #!/bin/sh
 Home=./testnet
 ChainID=testnet # chain-id
-ChainCMD=./build/metaos
+ChainCMD=./build/metaosd
 NodeName=metaos-node # node name
 NodeIP=(tcp://127.0.0.1 tcp://127.0.0.1 tcp://127.0.0.1 tcp://127.0.0.1)
 NodeNames=("node0" "node1" "node2" "node3")
@@ -19,9 +19,10 @@ SendStake=10000000000000${Stake}
 DataPath=/tmp
 
 Point=upoint
-PointOwner=iaa1g6gqr3s58dhw3jq5hm95qrng0sa9um7gavevjc # replace with actual address
+PointOwner=metaos1g6gqr3s58dhw3jq5hm95qrng0sa9um7g2e2fcx # replace with actual address
 PointToken=`echo {\"symbol\": \"point\", \"name\": \"Irita point native token\", \"scale\": 6, \"min_unit\": \"upoint\", \"initial_supply\": \"1000000000\", \"max_supply\": \"1000000000000\", \"mintable\": true, \"owner\": \"${PointOwner}\"}`
 
+rm -rf $Home
 $ChainCMD keys delete admin -y
 
 for i in `seq 0 $[ ${#Validators[*]} -1 ]`; do $ChainCMD keys delete ${Validators[$i]} -y; done
@@ -102,9 +103,10 @@ for i in `seq 0 $[ ${#Validators[*]} -1 ]`; do openssl x509 -req -in ${NodeDic[$
 
 bash -c "echo 12345678 | $ChainCMD add-genesis-validator --name ${NodeNames[0]} --cert ${NodeDic[0]}/validator.crt --power 10000 --from validator0 --home=$Home"
 
-
-#sed -i "s/persistent_peers = \"\"/persistent_peers = \"$($ChainCMD tendermint show-node-id --home=${NodeDic[0]} | sed 's/\^M\$//')@`echo ${NodeIP[0]} | awk -F // '{print $2}'`:26656,$($ChainCMD tendermint show-node-id --home=${NodeDic[1]} | sed 's/\^M\$//')@`echo ${NodeIP[0]} | awk -F // '{print $2}'`:36656,$($ChainCMD tendermint show-node-id --home=${NodeDic[2]} | sed 's/\^M\$//')@`echo ${NodeIP[0]} | awk -F // '{print $2}'`:46656,$($ChainCMD tendermint show-node-id --home=${NodeDic[3]} | sed 's/\^M\$//')@`echo ${NodeIP[0]} | awk -F // '{print $2}'`:56656\"/" $Home/config/config.toml
-sed -i "s/persistent_peers = \"\"/persistent_peers = \"$($ChainCMD tendermint show-node-id --home=${NodeDic[0]} | sed 's/\^M\$//')@`echo ${NodeIP[0]} | awk -F // '{print $2}'`:26656\"/" $Home/config/config.toml
+#sed -i 's/seed_mode = false/seed_mode = true/' $Home/config/config.toml
+#sed -i "s/seeds = \"\"/seeds = \"$($ChainCMD tendermint show-node-id --home=${NodeDic[0]} | sed 's/\^M\$//')@`echo ${NodeIP[0]} | awk -F // '{print $2}'`:26656,$($ChainCMD tendermint show-node-id --home=${NodeDic[1]} | sed 's/\^M\$//')@`echo ${NodeIP[0]} | awk -F // '{print $2}'`:36656,$($ChainCMD tendermint show-node-id --home=${NodeDic[2]} | sed 's/\^M\$//')@`echo ${NodeIP[0]} | awk -F // '{print $2}'`:46656,$($ChainCMD tendermint show-node-id --home=${NodeDic[3]} | sed 's/\^M\$//')@`echo ${NodeIP[0]} | awk -F // '{print $2}'`:56656\"/" $Home/config/config.toml
+sed -i "s/persistent_peers = \"\"/persistent_peers = \"$($ChainCMD tendermint show-node-id --home=${NodeDic[0]} | sed 's/\^M\$//')@`echo ${NodeIP[0]} | awk -F // '{print $2}'`:26656,$($ChainCMD tendermint show-node-id --home=${NodeDic[1]} | sed 's/\^M\$//')@`echo ${NodeIP[0]} | awk -F // '{print $2}'`:36656,$($ChainCMD tendermint show-node-id --home=${NodeDic[2]} | sed 's/\^M\$//')@`echo ${NodeIP[0]} | awk -F // '{print $2}'`:46656,$($ChainCMD tendermint show-node-id --home=${NodeDic[3]} | sed 's/\^M\$//')@`echo ${NodeIP[0]} | awk -F // '{print $2}'`:56656\"/" $Home/config/config.toml
+#sed -i "s/persistent_peers = \"\"/persistent_peers = \"$($ChainCMD tendermint show-node-id --home=${NodeDic[0]} | sed 's/\^M\$//')@`echo ${NodeIP[0]} | awk -F // '{print $2}'`:26656\"/" $Home/config/config.toml
 
 echo $($ChainCMD tendermint show-node-id --home=${NodeDic[0]} | sed 's/\^M\$//')
 echo $($ChainCMD tendermint show-node-id --home=${NodeDic[1]} | sed 's/\^M\$//')
@@ -150,3 +152,5 @@ sed -i 's/laddr = "tcp:\/\/0.0.0.0:26657"/proxy_app = "tcp:\/\/0.0.0.0:56657"/' 
 sed -i 's/pprof_laddr = "localhost:6060"/pprof_laddr = "localhost:56060"/' ${NodeDic[3]}/config/config.toml
 sed -i 's/laddr = "tcp:\/\/0.0.0.0:26656"/pprof_laddr = "tcp:\/\/0.0.0.0:56656"/' ${NodeDic[3]}/config/config.toml
 sed -i 's/prometheus_listen_addr = ":26660"/prometheus_listen_addr = ":56660"/' ${NodeDic[3]}/config/config.toml
+
+$ChainCMD start --pruning=nothing --home=${NodeDic[0]}

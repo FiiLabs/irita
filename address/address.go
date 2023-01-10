@@ -4,7 +4,7 @@ import sdk "github.com/cosmos/cosmos-sdk/types"
 
 var (
 	// Bech32MainPrefix defines the main SDK Bech32 prefix of an account's address
-	Bech32MainPrefix = "metaosd"
+	Bech32MainPrefix = "metaos"
 
 	// PrefixValidator is the prefix for validator keys
 	PrefixValidator = "val"
